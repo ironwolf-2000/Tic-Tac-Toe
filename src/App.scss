@@ -1,3 +1,15 @@
-h1 {
-    color: blue;
+@import '@assets/styles/constants.scss';
+
+body {
+    background-color: $primary-bg;
+}
+
+@font-face {
+    font-family: 'OutfitBold';
+    src: local('OutfitBold'), url('@assets/fonts/Outfit-Bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'OutfitRegular';
+    src: local('OutfitRegular'), url('@assets/fonts/Outfit-Regular.ttf') format('truetype');
 }
