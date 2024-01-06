@@ -17,17 +17,17 @@
         width: 100%;
         padding: 24px 24px 32px 24px;
         background-color: $golden-color;
-        box-shadow: inset 0 -8px 0 $box-shadow-golden;
+        box-shadow: inset 0 -8px 0 $golden-box-shadow;
         cursor: pointer;
         transition: 0.2s;
 
         &:hover,
         &:focus {
-            background-color: $orange-color;
+            background-color: $golden-hover;
         }
 
         &:active {
-            box-shadow: inset 0 -4px 0 $box-shadow-golden;
+            box-shadow: inset 0 -4px 0 $golden-box-shadow;
             transform: translateY(4px);
             padding-bottom: 28px;
         }
