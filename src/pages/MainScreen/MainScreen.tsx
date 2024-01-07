@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { Link } from 'react-router-dom';
 
 import { Logo } from '../../components';
 import { mainScreenCn, mainScreenNewGameButtonCn } from './MainScreen.cn';
@@ -12,7 +13,9 @@ export const MainScreen: FC<IMainScreenProps> = ({ mark, onPlayerMarkPick }) => 
         <main className={mainScreenCn}>
             <Logo />
             <Picker mark={mark} onPlayerMarkPick={onPlayerMarkPick} />
-            <button className={mainScreenNewGameButtonCn}>New Game</button>
+            <Link className={mainScreenNewGameButtonCn} to="/game">
+                New Game
+            </Link>
         </main>
     );
 };

@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import { MainScreen } from './pages/MainScreen';
+import { GameScreen, MainScreen } from './pages';
 import { Mark } from './App.typings';
 
 import './App.scss';
@@ -14,5 +15,16 @@ export const App = ({}) => {
         }
     };
 
-    return <MainScreen mark={mark} onPlayerMarkPick={handlePlayerMarkPick} />;
+    const router = createBrowserRouter([
+        {
+            path: '/',
+            element: <MainScreen mark={mark} onPlayerMarkPick={handlePlayerMarkPick} />,
+        },
+        {
+            path: '/game',
+            element: <GameScreen mark={mark} />,
+        },
+    ]);
+
+    return <RouterProvider router={router} />;
 };
