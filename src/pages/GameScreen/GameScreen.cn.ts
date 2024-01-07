@@ -1,6 +1,6 @@
 import { cn } from '@bem-react/classname';
 
-const cnGameScreen = cn('GameScreen');
+export const cnGameScreen = cn('GameScreen');
 
 export const GameScreenCn = cnGameScreen();
 
@@ -13,7 +13,6 @@ export const GameScreenIconButtonCn = cnGameScreen('IconButton');
 
 // BOARD
 export const GameScreenBoardCn = cnGameScreen('Board');
-export const GameScreenBoardCellCn = cnGameScreen('BoardCell');
 
 // FOOTER
 export const GameScreenStatsCn = cnGameScreen('Stats');

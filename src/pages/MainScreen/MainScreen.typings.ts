@@ -1,4 +1,4 @@
-import { Mark } from '../../App.typings';
+import { Mark } from '../../App.const';
 
 export interface IMainScreenProps {
     /** player's mark */

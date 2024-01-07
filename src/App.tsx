@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import { GameScreen, MainScreen } from './pages';
-import { Mark } from './App.typings';
+import { Mark } from './App.const';
 
 import './App.scss';
 
 export const App = ({}) => {
-    const [mark, setMark] = useState<Mark>('xMark');
+    const [mark, setMark] = useState<Mark>(Mark.X);
 
     const handlePlayerMarkPick = (newMark: Mark) => {
         if (newMark !== mark) {
