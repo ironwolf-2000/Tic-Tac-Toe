@@ -2,8 +2,6 @@ import { cn } from '@bem-react/classname';
 
 export const cnGameScreen = cn('GameScreen');
 
-export const GameScreenCn = cnGameScreen();
-
 // HEADER
 export const GameScreenHeaderCn = cnGameScreen('Header');
 export const GameScreenLogoCn = cnGameScreen('Logo');

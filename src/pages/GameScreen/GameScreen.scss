@@ -6,6 +6,12 @@
     min-width: 320px;
     max-width: 420px;
 
+    &_withOverlay {
+        opacity: 0.5;
+        position: relative;
+        z-index: -1;
+    }
+
     &-Header {
         display: flex;
         align-items: center;

@@ -1,10 +1,9 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 
+import { Mark } from '../../App.const';
 import { Logo } from '../../components';
 import {
     GameScreenButtonContainerCn,
-    GameScreenCn,
     GameScreenHeaderCn,
     GameScreenLogoCn,
     GameScreenIconButtonCn,
@@ -34,7 +33,7 @@ import {
 } from './GameScreen.const';
 import { IGameScreenProps, Winner } from './GameScreen.typings';
 import { deepMatrixCopy, getUpdatedStats } from './GameScreen.helpers';
-import { Mark } from '../../App.const';
+import { QuitGameModal } from './components/QuitGameModal';
 
 import oGray from '@assets/icons/o-gray.svg';
 import xGray from '@assets/icons/x-gray.svg';
@@ -54,6 +53,9 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
     const [availableCoord, setAvailableCoord] = useState(INITIAL_AVAILABLE_COORD);
     const [currentMark, setCurrentMark] = useState(Mark.X);
     const [gameEnded, setGameEnded] = useState(false);
+    const [quitGameModalVisible, setQuitGameModalVisible] = useState(false);
+
+    const GameScreenCn = cnGameScreen('', { withOverlay: quitGameModalVisible });
 
     const [statsKeyVal, setStatsKeyVal] = useState<[Winner, number][]>(
         (Object.keys(STATS_OBJECT) as Winner[]).map((key) => [key, 0])
@@ -195,54 +197,57 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
     };
 
     return (
-        <div className={GameScreenCn}>
-            <header className={GameScreenHeaderCn}>
-                <Logo className={GameScreenLogoCn} />
-                <div className={GameScreenLabelTurnCn}>
-                    <img
-                        src={currentMark === Mark.X ? xGray : oGray}
-                        width={LABEL_ICON_WIDTH}
-                        height={LABEL_ICON_HEIGHT}
-                    />
-                    turn
+        <>
+            <div className={GameScreenCn}>
+                <header className={GameScreenHeaderCn}>
+                    <Logo className={GameScreenLogoCn} />
+                    <div className={GameScreenLabelTurnCn}>
+                        <img
+                            src={currentMark === Mark.X ? xGray : oGray}
+                            width={LABEL_ICON_WIDTH}
+                            height={LABEL_ICON_HEIGHT}
+                        />
+                        turn
+                    </div>
+                    <div className={GameScreenButtonContainerCn}>
+                        <button className={GameScreenIconButtonCn} onClick={resetGame}>
+                            <img src={restartIcon} width={RESTART_ICON_WIDTH} height={RESTART_ICON_HEIGHT} />
+                        </button>
+                        <button className={GameScreenIconButtonCn} onClick={() => setQuitGameModalVisible(true)}>
+                            <img src={leaveIcon} width={LEAVE_ICON_WIDTH} height={LEAVE_ICON_HEIGHT} />
+                        </button>
+                    </div>
+                </header>
+                <div className={GameScreenBoardCn}>
+                    {board.map((rowValues, currentRow) =>
+                        rowValues.map((_, currentCol) => {
+                            return (
+                                <div
+                                    key={currentRow * BOARD_SIZE + currentCol}
+                                    className={getGameScreenBoardCellCn(currentRow, currentCol)}
+                                    onMouseMove={() => handleBoardCellMouseHover(currentRow, currentCol)}
+                                    onMouseLeave={() => handleBoardCellMouseLeave()}
+                                    onClick={() => handleBoardCellClick(currentRow, currentCol)}
+                                />
+                            );
+                        })
+                    )}
                 </div>
-                <div className={GameScreenButtonContainerCn}>
-                    <button className={GameScreenIconButtonCn} onClick={resetGame}>
-                        <img src={restartIcon} width={RESTART_ICON_WIDTH} height={RESTART_ICON_HEIGHT} />
-                    </button>
-                    <Link className={GameScreenIconButtonCn} to="/" replace>
-                        <img src={leaveIcon} width={LEAVE_ICON_WIDTH} height={LEAVE_ICON_HEIGHT} />
-                    </Link>
-                </div>
-            </header>
-            <div className={GameScreenBoardCn}>
-                {board.map((rowValues, currentRow) =>
-                    rowValues.map((_, currentCol) => {
-                        return (
-                            <div
-                                key={currentRow * BOARD_SIZE + currentCol}
-                                className={getGameScreenBoardCellCn(currentRow, currentCol)}
-                                onMouseMove={() => handleBoardCellMouseHover(currentRow, currentCol)}
-                                onMouseLeave={() => handleBoardCellMouseLeave()}
-                                onClick={() => handleBoardCellClick(currentRow, currentCol)}
-                            />
-                        );
-                    })
-                )}
+                <footer className={GameScreenFooterCn}>
+                    <div className={GameScreenStatsCn}>
+                        {statsKeyVal.map(([key, value]) => (
+                            <div key={key} className={GameScreenStatsCellCn}>
+                                <div>{STATS_OBJECT[key]}</div>
+                                <span className={GameScreenStatsCellCountCn}>{value}</span>
+                            </div>
+                        ))}
+                    </div>
+                    {playerMark !== currentMark && (
+                        <p className={GameScreenStatsOpponentLabelCn}>Your opponent is thinking...</p>
+                    )}
+                </footer>
             </div>
-            <footer className={GameScreenFooterCn}>
-                <div className={GameScreenStatsCn}>
-                    {statsKeyVal.map(([key, value]) => (
-                        <div key={key} className={GameScreenStatsCellCn}>
-                            <div>{STATS_OBJECT[key]}</div>
-                            <span className={GameScreenStatsCellCountCn}>{value}</span>
-                        </div>
-                    ))}
-                </div>
-                {playerMark !== currentMark && (
-                    <p className={GameScreenStatsOpponentLabelCn}>Your opponent is thinking...</p>
-                )}
-            </footer>
-        </div>
+            {quitGameModalVisible && <QuitGameModal onModalClose={() => setQuitGameModalVisible(false)} />}
+        </>
     );
 };

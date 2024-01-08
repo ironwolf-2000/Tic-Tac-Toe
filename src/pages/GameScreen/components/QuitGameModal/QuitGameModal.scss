@@ -1,0 +1,77 @@
+@import '@assets/styles/constants.scss';
+
+.QuitGameModal {
+    background-color: $black-color;
+    text-align: center;
+    position: fixed;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    padding: 64px 0;
+
+    &-Title {
+        color: $gray-color;
+        font-family: OutfitBold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 2.5rem;
+        margin: 0 0 32px;
+    }
+
+    &-ButtonWrapper {
+        display: flex;
+        column-gap: 16px;
+        justify-content: center;
+    }
+
+    &-Button {
+        font-family: OutfitBold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: $primary-bg;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        outline: none;
+        border: none;
+        border-radius: 8px;
+        box-sizing: border-box;
+        padding: 20px 30px 22px 30px;
+        cursor: pointer;
+        transition: 0.2s;
+        font-size: 1rem;
+
+        &_cancel {
+            background-color: $gray-color;
+            box-shadow: inset 0 -4px 0 $gray-box-shadow;
+
+            &:hover,
+            &:focus {
+                background-color: $gray-hover;
+            }
+
+            &:active {
+                box-shadow: inset 0 -2px 0 $gray-box-shadow;
+                transform: translateY(2px);
+                padding-bottom: 21px;
+            }
+        }
+
+        &_confirm {
+            background-color: $golden-color;
+            box-shadow: inset 0 -4px 0 $golden-box-shadow;
+
+            &:hover,
+            &:focus {
+                background-color: $golden-hover;
+            }
+
+            &:active {
+                box-shadow: inset 0 -2px 0 $golden-box-shadow;
+                transform: translateY(2px);
+                padding-bottom: 21px;
+            }
+        }
+    }
+}
