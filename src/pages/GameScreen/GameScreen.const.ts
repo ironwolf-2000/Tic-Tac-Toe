@@ -1,3 +1,5 @@
+import { Winner } from './GameScreen.typings';
+
 export const LABEL_ICON_WIDTH = 16;
 export const LABEL_ICON_HEIGHT = 16;
 export const RESTART_ICON_WIDTH = 18;
@@ -7,12 +9,16 @@ export const LEAVE_ICON_HEIGHT = 22;
 
 export const BOARD_SIZE = 3;
 
+export const OPPONENT_MOVE_TIME = 1000;
+
 export enum BoardCellValue {
     EMPTY = 0,
     X_MARK_HOVER = 10,
     X_MARK_SET = 11,
+    X_MARK_WINNER = 12,
     O_MARK_HOVER = 20,
     O_MARK_SET = 21,
+    O_MARK_WINNER = 22,
 }
 
 export const INITIAL_BOARD: BoardCellValue[][] = Array(BOARD_SIZE)
@@ -27,6 +33,14 @@ export const cellValueToClassName: Record<BoardCellValue, string> = {
     [BoardCellValue.EMPTY]: '',
     [BoardCellValue.X_MARK_HOVER]: 'xMarkHover',
     [BoardCellValue.X_MARK_SET]: 'xMarkSet',
+    [BoardCellValue.X_MARK_WINNER]: 'xMarkWinner',
     [BoardCellValue.O_MARK_HOVER]: 'oMarkHover',
     [BoardCellValue.O_MARK_SET]: 'oMarkSet',
+    [BoardCellValue.O_MARK_WINNER]: 'oMarkWinner',
+};
+
+export const STATS_OBJECT: Record<Winner, string> = {
+    [BoardCellValue.O_MARK_WINNER]: '"O" wins',
+    tie: 'Ties',
+    [BoardCellValue.X_MARK_WINNER]: '"X" wins',
 };

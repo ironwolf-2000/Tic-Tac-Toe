@@ -8,11 +8,11 @@ import { IMainScreenProps } from './MainScreen.typings';
 
 import './MainScreen.scss';
 
-export const MainScreen: FC<IMainScreenProps> = ({ mark, onPlayerMarkPick }) => {
+export const MainScreen: FC<IMainScreenProps> = ({ playerMark, onPlayerMarkPick }) => {
     return (
         <main className={mainScreenCn}>
             <Logo />
-            <Picker mark={mark} onPlayerMarkPick={onPlayerMarkPick} />
+            <Picker playerMark={playerMark} onPlayerMarkPick={onPlayerMarkPick} />
             <Link className={mainScreenNewGameButtonCn} to="/game">
                 New Game
             </Link>

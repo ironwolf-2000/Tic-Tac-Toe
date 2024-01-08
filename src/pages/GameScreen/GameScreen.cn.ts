@@ -15,6 +15,8 @@ export const GameScreenIconButtonCn = cnGameScreen('IconButton');
 export const GameScreenBoardCn = cnGameScreen('Board');
 
 // FOOTER
+export const GameScreenFooterCn = cnGameScreen('Footer');
 export const GameScreenStatsCn = cnGameScreen('Stats');
 export const GameScreenStatsCellCn = cnGameScreen('StatsCell');
 export const GameScreenStatsCellCountCn = cnGameScreen('StatsCellCount');
+export const GameScreenStatsOpponentLabelCn = cnGameScreen('OpponentLabel');

@@ -114,6 +114,10 @@
             background-image: url('../../assets/icons/x.svg');
         }
 
+        &_xMarkWinner {
+            background-image: url('../../assets/icons/x-white.svg');
+        }
+
         &_oMarkHover {
             background-image: url('../../assets/icons/o-outline.svg');
             cursor: pointer;
@@ -121,6 +125,10 @@
 
         &_oMarkSet {
             background-image: url('../../assets/icons/o.svg');
+        }
+
+        &_oMarkWinner {
+            background-image: url('../../assets/icons/o-white.svg');
         }
     }
 
@@ -162,5 +170,12 @@
     &-StatsCellCount {
         font-family: OutfitBold;
         font-size: 1.25rem;
+    }
+
+    &-OpponentLabel {
+        font-family: OutfitBold;
+        letter-spacing: 1px;
+        text-align: center;
+        color: $gray-color;
     }
 }

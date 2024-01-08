@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Logo } from '../../components';
@@ -14,6 +14,8 @@ import {
     GameScreenStatsCellCn,
     GameScreenStatsCellCountCn,
     cnGameScreen,
+    GameScreenFooterCn,
+    GameScreenStatsOpponentLabelCn,
 } from './GameScreen.cn';
 import {
     BOARD_SIZE,
@@ -25,10 +27,13 @@ import {
     RESTART_ICON_WIDTH,
     INITIAL_BOARD,
     INITIAL_AVAILABLE_COORD,
+    OPPONENT_MOVE_TIME,
     cellValueToClassName,
     BoardCellValue,
+    STATS_OBJECT,
 } from './GameScreen.const';
-import { IGameScreenProps } from './GameScreen.typings';
+import { IGameScreenProps, Winner } from './GameScreen.typings';
+import { deepMatrixCopy, getUpdatedStats } from './GameScreen.helpers';
 import { Mark } from '../../App.const';
 
 import oGray from '@assets/icons/o-gray.svg';
@@ -37,32 +42,84 @@ import leaveIcon from '@assets/icons/leave.svg';
 import restartIcon from '@assets/icons/restart.svg';
 import './GameScreen.scss';
 
-export const GameScreen: FC<IGameScreenProps> = ({ mark }) => {
+export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
     const valBase = useMemo(() => {
-        return mark === Mark.X ? BoardCellValue.X_MARK_HOVER : BoardCellValue.O_MARK_HOVER;
-    }, [mark]);
+        return playerMark === Mark.X ? BoardCellValue.X_MARK_HOVER : BoardCellValue.O_MARK_HOVER;
+    }, [playerMark]);
 
+    const computerMark = playerMark === Mark.X ? Mark.O : Mark.X;
+
+    const opponentTimeout = useRef<ReturnType<typeof setTimeout>>();
     const [board, setBoard] = useState(INITIAL_BOARD);
     const [availableCoord, setAvailableCoord] = useState(INITIAL_AVAILABLE_COORD);
+    const [currentMark, setCurrentMark] = useState(Mark.X);
+    const [gameEnded, setGameEnded] = useState(false);
 
-    const deepMatrixCopy = (M: BoardCellValue[][]) => M.map((row) => row.slice());
+    const [statsKeyVal, setStatsKeyVal] = useState<[Winner, number][]>(
+        (Object.keys(STATS_OBJECT) as Winner[]).map((key) => [key, 0])
+    );
 
-    const makeComputerMove = (newBoard: BoardCellValue[][], availableCoord: [number, number][]) => {
-        const val = mark === Mark.X ? BoardCellValue.O_MARK_SET : BoardCellValue.X_MARK_SET;
+    const resetGame = () => {
+        clearTimeout(opponentTimeout.current);
+        setCurrentMark(Mark.X);
+        setBoard(INITIAL_BOARD);
+        setAvailableCoord(INITIAL_AVAILABLE_COORD);
+        setGameEnded(false);
 
-        const i = Math.floor(Math.random() * availableCoord.length);
-        const [row, col] = availableCoord[i];
-        newBoard[row][col] = val;
+        if (playerMark === Mark.O) {
+            makeComputerMove(deepMatrixCopy(INITIAL_BOARD), INITIAL_AVAILABLE_COORD, null);
+        }
+    };
 
-        setBoard(newBoard);
-        setAvailableCoord(availableCoord.filter((_, index) => index !== i));
+    const updateStats = (winner: Winner) => {
+        const statsKeyValCopy = [...statsKeyVal];
+        statsKeyValCopy[statsKeyValCopy.findIndex(([key, _]) => key === String(winner))][1]++;
+        setStatsKeyVal(statsKeyValCopy);
+    };
+
+    const makeComputerMove = (
+        newBoard: BoardCellValue[][],
+        availableCoord: [number, number][],
+        winner: Winner | null
+    ) => {
+        if (winner !== null) {
+            updateStats(winner);
+            return;
+        }
+
+        if (availableCoord.length === 0) {
+            updateStats('tie');
+            return;
+        }
+
+        setCurrentMark(computerMark);
+
+        opponentTimeout.current = setTimeout(() => {
+            setCurrentMark(playerMark);
+
+            const val = playerMark === Mark.X ? BoardCellValue.O_MARK_SET : BoardCellValue.X_MARK_SET;
+
+            const i = Math.floor(Math.random() * availableCoord.length);
+            const [row, col] = availableCoord[i];
+            newBoard[row][col] = val;
+
+            const [updatedBoard, winner] = getUpdatedStats(newBoard);
+
+            setAvailableCoord(availableCoord.filter((_, index) => i !== index));
+            setBoard(updatedBoard);
+
+            if (winner) {
+                setGameEnded(true);
+                updateStats(winner);
+            }
+        }, OPPONENT_MOVE_TIME);
     };
 
     useEffect(() => {
-        if (mark === Mark.O) {
-            makeComputerMove(deepMatrixCopy(board), availableCoord);
+        if (playerMark === Mark.O) {
+            makeComputerMove(deepMatrixCopy(board), availableCoord, null);
         }
-    }, [mark]);
+    }, [playerMark]);
 
     const getGameScreenBoardCellCn = useCallback(
         (row: number, col: number) => {
@@ -71,7 +128,11 @@ export const GameScreen: FC<IGameScreenProps> = ({ mark }) => {
         [board]
     );
 
-    const handleBoardCellMouseEnter = (row: number, col: number) => {
+    const handleBoardCellMouseHover = (row: number, col: number) => {
+        if (currentMark !== playerMark || gameEnded || board[row][col] !== BoardCellValue.EMPTY) {
+            return;
+        }
+
         const newBoard = deepMatrixCopy(board);
 
         for (let i = 0; i < BOARD_SIZE; i++) {
@@ -88,6 +149,10 @@ export const GameScreen: FC<IGameScreenProps> = ({ mark }) => {
     };
 
     const handleBoardCellMouseLeave = () => {
+        if (currentMark !== playerMark || gameEnded) {
+            return;
+        }
+
         const newBoard = deepMatrixCopy(board);
 
         for (let i = 0; i < BOARD_SIZE; i++) {
@@ -102,7 +167,11 @@ export const GameScreen: FC<IGameScreenProps> = ({ mark }) => {
     };
 
     const handleBoardCellClick = (row: number, col: number) => {
-        if ([BoardCellValue.X_MARK_SET, BoardCellValue.O_MARK_SET].includes(board[row][col])) {
+        if (
+            [BoardCellValue.X_MARK_SET, BoardCellValue.O_MARK_SET].includes(board[row][col]) ||
+            currentMark !== playerMark ||
+            gameEnded
+        ) {
             return;
         }
 
@@ -114,15 +183,15 @@ export const GameScreen: FC<IGameScreenProps> = ({ mark }) => {
             newBoard[row][col] = BoardCellValue.O_MARK_SET;
         }
 
-        if (availableCoord.length === 1) {
-            setBoard(newBoard);
-            setAvailableCoord([]);
-        } else {
-            makeComputerMove(
-                newBoard,
-                availableCoord.filter(([r, c]) => r !== row || c !== col)
-            );
-        }
+        const newAvailableCoord = availableCoord.filter(([r, c]) => r !== row || c !== col);
+
+        const [updatedBoard, winner] = getUpdatedStats(newBoard);
+
+        setAvailableCoord(newAvailableCoord);
+        setBoard(updatedBoard);
+        setGameEnded(winner !== null);
+
+        makeComputerMove(newBoard, newAvailableCoord, winner);
     };
 
     return (
@@ -130,13 +199,17 @@ export const GameScreen: FC<IGameScreenProps> = ({ mark }) => {
             <header className={GameScreenHeaderCn}>
                 <Logo className={GameScreenLogoCn} />
                 <div className={GameScreenLabelTurnCn}>
-                    <img src={mark === Mark.X ? xGray : oGray} width={LABEL_ICON_WIDTH} height={LABEL_ICON_HEIGHT} />
+                    <img
+                        src={currentMark === Mark.X ? xGray : oGray}
+                        width={LABEL_ICON_WIDTH}
+                        height={LABEL_ICON_HEIGHT}
+                    />
                     turn
                 </div>
                 <div className={GameScreenButtonContainerCn}>
-                    <Link className={GameScreenIconButtonCn} to="/game" reloadDocument>
+                    <button className={GameScreenIconButtonCn} onClick={resetGame}>
                         <img src={restartIcon} width={RESTART_ICON_WIDTH} height={RESTART_ICON_HEIGHT} />
-                    </Link>
+                    </button>
                     <Link className={GameScreenIconButtonCn} to="/" replace>
                         <img src={leaveIcon} width={LEAVE_ICON_WIDTH} height={LEAVE_ICON_HEIGHT} />
                     </Link>
@@ -149,7 +222,7 @@ export const GameScreen: FC<IGameScreenProps> = ({ mark }) => {
                             <div
                                 key={currentRow * BOARD_SIZE + currentCol}
                                 className={getGameScreenBoardCellCn(currentRow, currentCol)}
-                                onMouseEnter={() => handleBoardCellMouseEnter(currentRow, currentCol)}
+                                onMouseMove={() => handleBoardCellMouseHover(currentRow, currentCol)}
                                 onMouseLeave={() => handleBoardCellMouseLeave()}
                                 onClick={() => handleBoardCellClick(currentRow, currentCol)}
                             />
@@ -157,19 +230,18 @@ export const GameScreen: FC<IGameScreenProps> = ({ mark }) => {
                     })
                 )}
             </div>
-            <footer className={GameScreenStatsCn}>
-                <div className={GameScreenStatsCellCn}>
-                    <div>"O" wins</div>
-                    <span className={GameScreenStatsCellCountCn}>1</span>
+            <footer className={GameScreenFooterCn}>
+                <div className={GameScreenStatsCn}>
+                    {statsKeyVal.map(([key, value]) => (
+                        <div key={key} className={GameScreenStatsCellCn}>
+                            <div>{STATS_OBJECT[key]}</div>
+                            <span className={GameScreenStatsCellCountCn}>{value}</span>
+                        </div>
+                    ))}
                 </div>
-                <div className={GameScreenStatsCellCn}>
-                    <div>Ties</div>
-                    <span className={GameScreenStatsCellCountCn}>2</span>
-                </div>
-                <div className={GameScreenStatsCellCn}>
-                    <div>"X" wins</div>
-                    <span className={GameScreenStatsCellCountCn}>3</span>
-                </div>
+                {playerMark !== currentMark && (
+                    <p className={GameScreenStatsOpponentLabelCn}>Your opponent is thinking...</p>
+                )}
             </footer>
         </div>
     );
