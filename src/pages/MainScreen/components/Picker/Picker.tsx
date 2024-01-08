@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { PickerTitleCn, PickerFooterTextCn, PickerCn, cnPicker, PickerSwitchCn } from './Picker.cn';
+import { PickerTitleCn, PickerFooterTextCn, PickerCn, cnPicker, PickerSwitchItemCn } from './Picker.cn';
 import { IPickerProps } from './Picker.typings';
 import { ICON_HEIGHT, ICON_WIDTH } from './Picker.const';
 import { Mark } from '../../../../App.const';
@@ -12,6 +12,8 @@ import xGray from '@assets/icons/x-gray.svg';
 import './Picker.scss';
 
 export const Picker: FC<IPickerProps> = ({ playerMark, onPlayerMarkPick }) => {
+    const PickerSwitchCn = cnPicker('Switch', { oMark: playerMark === Mark.O });
+
     const xSrc = playerMark === Mark.X ? xBlack : xGray;
     const oSrc = playerMark === Mark.O ? oBlack : oGray;
 
@@ -19,16 +21,10 @@ export const Picker: FC<IPickerProps> = ({ playerMark, onPlayerMarkPick }) => {
         <section className={PickerCn}>
             <header className={PickerTitleCn}>Pick player 1’s mark</header>
             <div className={PickerSwitchCn}>
-                <button
-                    className={cnPicker('SwitchItem', { selected: playerMark === Mark.X })}
-                    onClick={() => onPlayerMarkPick(Mark.X)}
-                >
+                <button className={PickerSwitchItemCn} onClick={() => onPlayerMarkPick(Mark.X)}>
                     <img src={xSrc} width={ICON_WIDTH} height={ICON_HEIGHT} />
                 </button>
-                <button
-                    className={cnPicker('SwitchItem', { selected: playerMark === Mark.O })}
-                    onClick={() => onPlayerMarkPick(Mark.O)}
-                >
+                <button className={PickerSwitchItemCn} onClick={() => onPlayerMarkPick(Mark.O)}>
                     <img src={oSrc} width={ICON_WIDTH} height={ICON_HEIGHT} />
                 </button>
             </div>
