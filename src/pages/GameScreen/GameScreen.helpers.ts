@@ -1,12 +1,11 @@
-import { BoardCellValue, BOARD_SIZE } from './GameScreen.const';
-import { Winner } from './GameScreen.typings';
+import { BoardCellValue, BOARD_SIZE, Winner } from './GameScreen.const';
 
 export const deepMatrixCopy = <T>(M: T[][]) => M.map((row) => row.slice());
 
 export const getUpdatedStats = (board: BoardCellValue[][]): [BoardCellValue[][], Winner | null] => {
     const marks = [
-        [BoardCellValue.X_MARK_SET, BoardCellValue.X_MARK_WINNER],
-        [BoardCellValue.O_MARK_SET, BoardCellValue.O_MARK_WINNER],
+        [BoardCellValue.X_MARK_SET, BoardCellValue.X_MARK_WINNER, Winner.X_MARK],
+        [BoardCellValue.O_MARK_SET, BoardCellValue.O_MARK_WINNER, Winner.O_MARK],
     ] as const;
 
     // rows
@@ -21,13 +20,13 @@ export const getUpdatedStats = (board: BoardCellValue[][]): [BoardCellValue[][],
             count[board[i][j]]++;
         }
 
-        for (const [markSet, markWinner] of marks) {
+        for (const [markSet, markWinner, winner] of marks) {
             if (count[markSet] === BOARD_SIZE) {
                 for (let j = 0; j < BOARD_SIZE; j++) {
                     board[i][j] = markWinner;
                 }
 
-                return [board, markWinner];
+                return [board, winner];
             }
         }
     }
@@ -44,13 +43,13 @@ export const getUpdatedStats = (board: BoardCellValue[][]): [BoardCellValue[][],
             count[board[j][i]]++;
         }
 
-        for (const [markSet, markWinner] of marks) {
+        for (const [markSet, markWinner, winner] of marks) {
             if (count[markSet] === BOARD_SIZE) {
                 for (let j = 0; j < BOARD_SIZE; j++) {
                     board[j][i] = markWinner;
                 }
 
-                return [board, markWinner];
+                return [board, winner];
             }
         }
     }
@@ -69,14 +68,14 @@ export const getUpdatedStats = (board: BoardCellValue[][]): [BoardCellValue[][],
             count[board[i][j]]++;
         }
 
-        for (const [markSet, markWinner] of marks) {
+        for (const [markSet, markWinner, winner] of marks) {
             if (count[markSet] === BOARD_SIZE) {
                 for (let i = 0; i < BOARD_SIZE; i++) {
                     const j = k === 0 ? i : BOARD_SIZE - 1 - i;
                     board[i][j] = markWinner;
                 }
 
-                return [board, markWinner];
+                return [board, winner];
             }
         }
     }

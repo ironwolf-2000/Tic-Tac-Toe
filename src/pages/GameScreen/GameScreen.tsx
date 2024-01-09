@@ -27,11 +27,12 @@ import {
     INITIAL_BOARD,
     INITIAL_AVAILABLE_COORD,
     OPPONENT_MOVE_TIME,
+    STATS_DATA,
     cellValueToClassName,
     BoardCellValue,
-    STATS_OBJECT,
+    Winner,
 } from './GameScreen.const';
-import { IGameScreenProps, Winner } from './GameScreen.typings';
+import { IGameScreenProps } from './GameScreen.typings';
 import { deepMatrixCopy, getUpdatedStats } from './GameScreen.helpers';
 import { QuitGameModal } from './components/QuitGameModal';
 
@@ -57,8 +58,8 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
 
     const GameScreenCn = cnGameScreen('', { withOverlay: quitGameModalVisible });
 
-    const [statsKeyVal, setStatsKeyVal] = useState<[Winner, number][]>(
-        (Object.keys(STATS_OBJECT) as Winner[]).map((key) => [key, 0])
+    const [statsValues, setStatsValues] = useState<[Winner, string, number][]>(
+        STATS_DATA.map(([key, label]) => [key, label, 0])
     );
 
     const resetGame = () => {
@@ -74,9 +75,9 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
     };
 
     const updateStats = (winner: Winner) => {
-        const statsKeyValCopy = [...statsKeyVal];
-        statsKeyValCopy[statsKeyValCopy.findIndex(([key, _]) => key === String(winner))][1]++;
-        setStatsKeyVal(statsKeyValCopy);
+        const statsValuesCopy = [...statsValues];
+        statsValuesCopy[statsValuesCopy.findIndex(([key, _, __]) => key === winner)][2]++;
+        setStatsValues(statsValuesCopy);
     };
 
     const makeComputerMove = (
@@ -90,7 +91,7 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
         }
 
         if (availableCoord.length === 0) {
-            updateStats('tie');
+            updateStats(Winner.TIE);
             return;
         }
 
@@ -121,6 +122,8 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
         if (playerMark === Mark.O) {
             makeComputerMove(deepMatrixCopy(board), availableCoord, null);
         }
+
+        return () => clearTimeout(opponentTimeout.current);
     }, [playerMark]);
 
     const getGameScreenBoardCellCn = useCallback(
@@ -235,9 +238,9 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
                 </div>
                 <footer className={GameScreenFooterCn}>
                     <div className={GameScreenStatsCn}>
-                        {statsKeyVal.map(([key, value]) => (
+                        {statsValues.map(([key, label, value]) => (
                             <div key={key} className={GameScreenStatsCellCn}>
-                                <div>{STATS_OBJECT[key]}</div>
+                                <div>{label}</div>
                                 <span className={GameScreenStatsCellCountCn}>{value}</span>
                             </div>
                         ))}

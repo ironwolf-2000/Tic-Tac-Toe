@@ -1,5 +1,3 @@
-import { Winner } from './GameScreen.typings';
-
 export const LABEL_ICON_WIDTH = 16;
 export const LABEL_ICON_HEIGHT = 16;
 export const RESTART_ICON_WIDTH = 18;
@@ -21,6 +19,12 @@ export enum BoardCellValue {
     O_MARK_WINNER = 22,
 }
 
+export enum Winner {
+    X_MARK,
+    O_MARK,
+    TIE,
+}
+
 export const INITIAL_BOARD: BoardCellValue[][] = Array(BOARD_SIZE)
     .fill(null)
     .map(() => Array(BOARD_SIZE).fill(0));
@@ -39,8 +43,8 @@ export const cellValueToClassName: Record<BoardCellValue, string> = {
     [BoardCellValue.O_MARK_WINNER]: 'oMarkWinner',
 };
 
-export const STATS_OBJECT: Record<Winner, string> = {
-    [BoardCellValue.O_MARK_WINNER]: '"O" wins',
-    tie: 'Ties',
-    [BoardCellValue.X_MARK_WINNER]: '"X" wins',
-};
+export const STATS_DATA = [
+    [Winner.X_MARK, '"X" wins'],
+    [Winner.O_MARK, '"O" wins'],
+    [Winner.TIE, 'Ties'],
+] as const;
