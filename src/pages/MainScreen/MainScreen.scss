@@ -1,4 +1,5 @@
 @import '@assets/styles/constants.scss';
+@import '@assets/styles/placeholders.scss';
 
 .MainScreen {
     padding: 0 24px;
@@ -7,20 +8,13 @@
     max-width: 420px;
 
     &-NewGameButton {
-        font-family: OutfitBold;
-        text-transform: uppercase;
-        text-decoration: none;
-        text-align: center;
-        letter-spacing: 1px;
+        @extend %button;
         border-radius: 16px;
-        color: $primary-bg;
-        display: block;
-        box-sizing: border-box;
         width: 100%;
-        padding: 24px 24px 32px 24px;
+        color: $primary-bg;
         background-color: $golden-color;
         box-shadow: inset 0 -8px 0 $golden-box-shadow;
-        transition: 0.2s;
+        padding: 24px 24px 32px 24px;
 
         &:hover,
         &:focus {

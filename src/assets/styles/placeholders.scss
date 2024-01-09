@@ -1,0 +1,14 @@
+%button {
+    font-family: OutfitBold;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 1px;
+    box-sizing: border-box;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+    border: none;
+    cursor: pointer;
+}

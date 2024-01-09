@@ -1,4 +1,5 @@
 @import '@assets/styles/constants.scss';
+@import '@assets/styles/placeholders.scss';
 
 .GameScreen {
     margin: 10vh auto 5vh;
@@ -51,18 +52,11 @@
     }
 
     &-IconButton {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        outline: none;
-        border: none;
+        @extend %button;
         border-radius: 8px;
         background-color: $gray-color;
         box-shadow: inset 0 -4px 0 $gray-box-shadow;
-        box-sizing: border-box;
         padding-bottom: 2px;
-        transition: 0.2s;
-        cursor: pointer;
         width: 36px;
         height: 36px;
 
