@@ -10,7 +10,7 @@ export const getUpdatedStats = (board: BoardCellValue[][]): [BoardCellValue[][],
 
     // rows
     for (let i = 0; i < BOARD_SIZE; i++) {
-        const count: Record<number, number> = {};
+        const count = {} as Record<BoardCellValue, number>;
 
         for (let j = 0; j < BOARD_SIZE; j++) {
             if (!(board[i][j] in count)) {
@@ -33,7 +33,7 @@ export const getUpdatedStats = (board: BoardCellValue[][]): [BoardCellValue[][],
 
     // columns
     for (let i = 0; i < BOARD_SIZE; i++) {
-        const count: Record<number, number> = {};
+        const count = {} as Record<BoardCellValue, number>;
 
         for (let j = 0; j < BOARD_SIZE; j++) {
             if (!(board[j][i] in count)) {
@@ -56,7 +56,7 @@ export const getUpdatedStats = (board: BoardCellValue[][]): [BoardCellValue[][],
 
     // diagonals
     for (let k = 0; k < 2; k++) {
-        const count: Record<number, number> = {};
+        const count = {} as Record<BoardCellValue, number>;
 
         for (let i = 0; i < BOARD_SIZE; i++) {
             let j = k === 0 ? i : BOARD_SIZE - 1 - i;

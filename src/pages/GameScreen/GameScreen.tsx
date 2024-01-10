@@ -85,7 +85,7 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
         availableCoord: [number, number][],
         winner: Winner | null
     ) => {
-        if (winner !== null) {
+        if (winner) {
             updateStats(winner);
             return;
         }

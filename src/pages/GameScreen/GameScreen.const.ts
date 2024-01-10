@@ -10,19 +10,19 @@ export const BOARD_SIZE = 3;
 export const OPPONENT_MOVE_TIME = 1000;
 
 export enum BoardCellValue {
-    EMPTY = 0,
-    X_MARK_HOVER = 10,
-    X_MARK_SET = 11,
-    X_MARK_WINNER = 12,
-    O_MARK_HOVER = 20,
-    O_MARK_SET = 21,
-    O_MARK_WINNER = 22,
+    EMPTY = 'EMPTY',
+    X_MARK_HOVER = 'X_MARK_HOVER',
+    X_MARK_SET = 'X_MARK_SET',
+    X_MARK_WINNER = 'X_MARK_WINNER',
+    O_MARK_HOVER = 'O_MARK_HOVER',
+    O_MARK_SET = 'O_MARK_SET',
+    O_MARK_WINNER = 'O_MARK_WINNER',
 }
 
 export enum Winner {
-    X_MARK,
-    O_MARK,
-    TIE,
+    X_MARK = 'X_MARK',
+    O_MARK = 'O_MARK',
+    TIE = 'TIE',
 }
 
 export const INITIAL_BOARD: BoardCellValue[][] = Array(BOARD_SIZE)
