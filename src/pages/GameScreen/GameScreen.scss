@@ -94,41 +94,50 @@
     &-BoardCell {
         width: 100%;
         height: 100%;
-        background-color: $black-color;
         box-shadow: inset 0 -8px 0 $black-box-shadow;
         border-radius: 16px;
-        background-repeat: no-repeat;
-        background-position: 50% calc(50% - 4px);
-        background-size: 48px;
+        background-color: $black-color;
 
-        @media screen and (min-width: $mobile-l-breakpoint) {
-            background-size: 64px;
+        &::after {
+            content: '';
+            display: block;
+            height: 100%;
+            background-repeat: no-repeat;
+            background-position: 50% calc(50% - 4px);
+            background-size: 30%;
+            transition: background-size 0.2s;
         }
 
-        &_xMarkHover {
+        &_xMarkHover::after {
             background-image: url('../../assets/icons/x-outline.svg');
+            background-size: 50%;
             cursor: pointer;
         }
 
-        &_xMarkSet {
+        &_xMarkSet::after {
             background-image: url('../../assets/icons/x.svg');
+            background-size: 50%;
         }
 
-        &_xMarkWinner {
+        &_xMarkWinner::after {
             background-image: url('../../assets/icons/x-white.svg');
+            background-size: 50%;
         }
 
-        &_oMarkHover {
+        &_oMarkHover::after {
             background-image: url('../../assets/icons/o-outline.svg');
+            background-size: 50%;
             cursor: pointer;
         }
 
-        &_oMarkSet {
+        &_oMarkSet::after {
             background-image: url('../../assets/icons/o.svg');
+            background-size: 50%;
         }
 
-        &_oMarkWinner {
+        &_oMarkWinner::after {
             background-image: url('../../assets/icons/o-white.svg');
+            background-size: 50%;
         }
     }
 
