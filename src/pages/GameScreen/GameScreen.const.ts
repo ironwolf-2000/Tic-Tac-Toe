@@ -1,11 +1,11 @@
+import { Mark } from '../../App.const';
+
 export const LABEL_ICON_WIDTH = 16;
 export const LABEL_ICON_HEIGHT = 16;
 export const RESTART_ICON_WIDTH = 18;
 export const RESTART_ICON_HEIGHT = 18;
 export const LEAVE_ICON_WIDTH = 22;
 export const LEAVE_ICON_HEIGHT = 22;
-
-export const BOARD_SIZE = 3;
 
 export const OPPONENT_MOVE_TIME = 1000;
 
@@ -25,15 +25,11 @@ export enum Winner {
     TIE = 'TIE',
 }
 
-export const INITIAL_BOARD: BoardCellValue[][] = Array(BOARD_SIZE)
+export const INITIAL_BOARD: BoardCellValue[][] = Array(3)
     .fill(null)
-    .map(() => Array(BOARD_SIZE).fill(0));
+    .map(() => Array(3).fill(0));
 
-export const INITIAL_AVAILABLE_COORD: [number, number][] = Array(BOARD_SIZE ** 2)
-    .fill(null)
-    .map((_, i) => [Math.floor(i / BOARD_SIZE), i % BOARD_SIZE]);
-
-export const cellValueToClassName: Record<BoardCellValue, string> = {
+export const cellValToClassName: Record<BoardCellValue, string> = {
     [BoardCellValue.EMPTY]: '',
     [BoardCellValue.X_MARK_HOVER]: 'xMarkHover',
     [BoardCellValue.X_MARK_SET]: 'xMarkSet',
@@ -48,3 +44,33 @@ export const STATS_DATA = [
     [Winner.O_MARK, '"O" wins'],
     [Winner.TIE, 'Ties'],
 ] as const;
+
+export const markHoverToMarkSet = {
+    [BoardCellValue.X_MARK_HOVER]: BoardCellValue.X_MARK_SET,
+    [BoardCellValue.O_MARK_HOVER]: BoardCellValue.O_MARK_SET,
+};
+
+export const winnerToMarkSet = {
+    [Winner.X_MARK]: BoardCellValue.X_MARK_SET,
+    [Winner.O_MARK]: BoardCellValue.O_MARK_SET,
+};
+
+export const winnerToMarkWinner = {
+    [Winner.X_MARK]: BoardCellValue.X_MARK_WINNER,
+    [Winner.O_MARK]: BoardCellValue.O_MARK_WINNER,
+};
+
+export const markToHover = {
+    [Mark.X]: BoardCellValue.X_MARK_HOVER,
+    [Mark.O]: BoardCellValue.O_MARK_HOVER,
+};
+
+export const markToMarkSet = {
+    [Mark.X]: BoardCellValue.X_MARK_SET,
+    [Mark.O]: BoardCellValue.O_MARK_SET,
+};
+
+export const markToWinner = {
+    [Mark.X]: Winner.X_MARK,
+    [Mark.O]: Winner.O_MARK,
+};

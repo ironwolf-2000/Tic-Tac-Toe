@@ -1,6 +1,6 @@
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 
-import { Mark } from '../../App.const';
+import { Difficulty, Mark } from '../../App.const';
 import { Logo } from '../../components';
 import {
     GameScreenButtonContainerCn,
@@ -17,7 +17,6 @@ import {
     GameScreenStatsOpponentLabelCn,
 } from './GameScreen.cn';
 import {
-    BOARD_SIZE,
     LABEL_ICON_HEIGHT,
     LABEL_ICON_WIDTH,
     LEAVE_ICON_HEIGHT,
@@ -25,15 +24,22 @@ import {
     RESTART_ICON_HEIGHT,
     RESTART_ICON_WIDTH,
     INITIAL_BOARD,
-    INITIAL_AVAILABLE_COORD,
     OPPONENT_MOVE_TIME,
     STATS_DATA,
-    cellValueToClassName,
+    cellValToClassName,
     BoardCellValue,
     Winner,
+    markToHover,
+    markToMarkSet,
 } from './GameScreen.const';
 import { IGameScreenProps } from './GameScreen.typings';
-import { deepMatrixCopy, getUpdatedStats } from './GameScreen.helpers';
+import {
+    deepMatrixCopy,
+    determineWinner,
+    getNextMove,
+    getUpdatedBoard,
+    isBoardCellAvailable,
+} from './GameScreen.helpers';
 import { QuitGameModal } from './components/QuitGameModal';
 
 import oGray from '@assets/icons/o-gray.svg';
@@ -43,15 +49,10 @@ import restartIcon from '@assets/icons/restart.svg';
 import './GameScreen.scss';
 
 export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
-    const valBase = useMemo(() => {
-        return playerMark === Mark.X ? BoardCellValue.X_MARK_HOVER : BoardCellValue.O_MARK_HOVER;
-    }, [playerMark]);
-
     const computerMark = playerMark === Mark.X ? Mark.O : Mark.X;
 
     const opponentTimeout = useRef<ReturnType<typeof setTimeout>>();
     const [board, setBoard] = useState(INITIAL_BOARD);
-    const [availableCoord, setAvailableCoord] = useState(INITIAL_AVAILABLE_COORD);
     const [currentMark, setCurrentMark] = useState(Mark.X);
     const [gameEnded, setGameEnded] = useState(false);
     const [quitGameModalVisible, setQuitGameModalVisible] = useState(false);
@@ -64,13 +65,12 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
 
     const resetGame = () => {
         clearTimeout(opponentTimeout.current);
-        setCurrentMark(Mark.X);
+        setCurrentMark(playerMark);
         setBoard(INITIAL_BOARD);
-        setAvailableCoord(INITIAL_AVAILABLE_COORD);
         setGameEnded(false);
 
         if (playerMark === Mark.O) {
-            makeComputerMove(deepMatrixCopy(INITIAL_BOARD), INITIAL_AVAILABLE_COORD, null);
+            makeComputerMove(deepMatrixCopy(INITIAL_BOARD));
         }
     };
 
@@ -80,56 +80,16 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
         setStatsValues(statsValuesCopy);
     };
 
-    const makeComputerMove = (
-        newBoard: BoardCellValue[][],
-        availableCoord: [number, number][],
-        winner: Winner | null
-    ) => {
-        if (winner) {
-            updateStats(winner);
-            return;
-        }
-
-        if (availableCoord.length === 0) {
-            updateStats(Winner.TIE);
-            return;
-        }
-
-        setCurrentMark(computerMark);
-
-        opponentTimeout.current = setTimeout(() => {
-            setCurrentMark(playerMark);
-
-            const val = playerMark === Mark.X ? BoardCellValue.O_MARK_SET : BoardCellValue.X_MARK_SET;
-
-            const i = Math.floor(Math.random() * availableCoord.length);
-            const [row, col] = availableCoord[i];
-            newBoard[row][col] = val;
-
-            const [updatedBoard, winner] = getUpdatedStats(newBoard);
-
-            setAvailableCoord(availableCoord.filter((_, index) => i !== index));
-            setBoard(updatedBoard);
-
-            if (winner) {
-                setGameEnded(true);
-                updateStats(winner);
-            }
-        }, OPPONENT_MOVE_TIME);
-    };
-
     useEffect(() => {
         if (playerMark === Mark.O) {
-            makeComputerMove(deepMatrixCopy(board), availableCoord, null);
+            makeComputerMove(deepMatrixCopy(board));
         }
 
         return () => clearTimeout(opponentTimeout.current);
     }, [playerMark]);
 
     const getGameScreenBoardCellCn = useCallback(
-        (row: number, col: number) => {
-            return cnGameScreen('BoardCell', { [cellValueToClassName[board[row][col]]]: true });
-        },
+        (row: number, col: number) => cnGameScreen('BoardCell', { [cellValToClassName[board[row][col]]]: true }),
         [board]
     );
 
@@ -140,12 +100,12 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
 
         const newBoard = deepMatrixCopy(board);
 
-        for (let i = 0; i < BOARD_SIZE; i++) {
-            for (let j = 0; j < BOARD_SIZE; j++) {
+        for (let i = 0; i < newBoard.length; i++) {
+            for (let j = 0; j < newBoard.length; j++) {
                 if ([BoardCellValue.X_MARK_HOVER, BoardCellValue.O_MARK_HOVER].includes(newBoard[i][j])) {
                     newBoard[i][j] = BoardCellValue.EMPTY;
                 } else if (newBoard[i][j] === BoardCellValue.EMPTY && i === row && j === col) {
-                    newBoard[i][j] = valBase;
+                    newBoard[i][j] = markToHover[playerMark];
                 }
             }
         }
@@ -160,8 +120,8 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
 
         const newBoard = deepMatrixCopy(board);
 
-        for (let i = 0; i < BOARD_SIZE; i++) {
-            for (let j = 0; j < BOARD_SIZE; j++) {
+        for (let i = 0; i < newBoard.length; i++) {
+            for (let j = 0; j < newBoard.length; j++) {
                 if ([BoardCellValue.X_MARK_HOVER, BoardCellValue.O_MARK_HOVER].includes(newBoard[i][j])) {
                     newBoard[i][j] = BoardCellValue.EMPTY;
                 }
@@ -171,32 +131,48 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
         setBoard(newBoard);
     };
 
-    const handleBoardCellClick = (row: number, col: number) => {
-        if (
-            [BoardCellValue.X_MARK_SET, BoardCellValue.O_MARK_SET].includes(board[row][col]) ||
-            currentMark !== playerMark ||
-            gameEnded
-        ) {
+    const updateForWinner = (board: BoardCellValue[][], playerMove?: boolean) => {
+        const winner = determineWinner(board);
+
+        if (winner) {
+            setBoard(getUpdatedBoard(board));
+            setGameEnded(true);
+            updateStats(winner);
+        } else {
+            setBoard(board);
+
+            if (playerMove) {
+                makeComputerMove(board);
+                setCurrentMark(computerMark);
+            } else {
+                setCurrentMark(playerMark);
+            }
+        }
+    };
+
+    const makeComputerMove = (newBoard: BoardCellValue[][]) => {
+        opponentTimeout.current = setTimeout(() => {
+            const move = getNextMove(newBoard, computerMark, Difficulty.MEDIUM);
+
+            if (move) {
+                const computerMarkSet = playerMark === Mark.X ? BoardCellValue.O_MARK_SET : BoardCellValue.X_MARK_SET;
+                const [row, col] = move;
+                newBoard[row][col] = computerMarkSet;
+
+                updateForWinner(newBoard);
+            }
+        }, OPPONENT_MOVE_TIME);
+    };
+
+    const makePlayerMove = (row: number, col: number) => {
+        if (!isBoardCellAvailable(board[row][col]) || currentMark !== playerMark || gameEnded) {
             return;
         }
 
         const newBoard = deepMatrixCopy(board);
+        newBoard[row][col] = markToMarkSet[playerMark];
 
-        if (valBase === BoardCellValue.X_MARK_HOVER) {
-            newBoard[row][col] = BoardCellValue.X_MARK_SET;
-        } else if (valBase === BoardCellValue.O_MARK_HOVER) {
-            newBoard[row][col] = BoardCellValue.O_MARK_SET;
-        }
-
-        const newAvailableCoord = availableCoord.filter(([r, c]) => r !== row || c !== col);
-
-        const [updatedBoard, winner] = getUpdatedStats(newBoard);
-
-        setAvailableCoord(newAvailableCoord);
-        setBoard(updatedBoard);
-        setGameEnded(winner !== null);
-
-        makeComputerMove(newBoard, newAvailableCoord, winner);
+        updateForWinner(newBoard, true);
     };
 
     return (
@@ -226,11 +202,11 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
                         rowValues.map((_, currentCol) => {
                             return (
                                 <div
-                                    key={currentRow * BOARD_SIZE + currentCol}
+                                    key={currentRow * board.length + currentCol}
                                     className={getGameScreenBoardCellCn(currentRow, currentCol)}
                                     onMouseMove={() => handleBoardCellMouseHover(currentRow, currentCol)}
                                     onMouseLeave={() => handleBoardCellMouseLeave()}
-                                    onClick={() => handleBoardCellClick(currentRow, currentCol)}
+                                    onClick={() => makePlayerMove(currentRow, currentCol)}
                                 />
                             );
                         })
@@ -245,7 +221,7 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
                             </div>
                         ))}
                     </div>
-                    {playerMark !== currentMark && (
+                    {playerMark !== currentMark && !gameEnded && (
                         <p className={GameScreenStatsOpponentLabelCn}>Your opponent is thinking...</p>
                     )}
                 </footer>
