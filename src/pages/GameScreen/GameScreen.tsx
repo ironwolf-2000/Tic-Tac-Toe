@@ -1,6 +1,6 @@
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 
-import { Difficulty, Mark } from '../../App.const';
+import { Mark } from '../../App.const';
 import { Logo } from '../../components';
 import {
     GameScreenButtonContainerCn,
@@ -48,31 +48,25 @@ import leaveIcon from '@assets/icons/leave.svg';
 import restartIcon from '@assets/icons/restart.svg';
 import './GameScreen.scss';
 
-export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
+export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => {
     const computerMark = playerMark === Mark.X ? Mark.O : Mark.X;
 
-    const opponentTimeout = useRef<ReturnType<typeof setTimeout>>();
-    const [board, setBoard] = useState(INITIAL_BOARD);
     const [currentMark, setCurrentMark] = useState(Mark.X);
+    const [board, setBoard] = useState(INITIAL_BOARD);
     const [gameEnded, setGameEnded] = useState(false);
     const [quitGameModalVisible, setQuitGameModalVisible] = useState(false);
 
     const GameScreenCn = cnGameScreen('', { withOverlay: quitGameModalVisible });
 
+    const opponentTimeout = useRef<ReturnType<typeof setTimeout>>();
+
+    useEffect(() => {
+        return () => clearTimeout(opponentTimeout.current);
+    }, []);
+
     const [statsValues, setStatsValues] = useState<[Winner, string, number][]>(
         STATS_DATA.map(([key, label]) => [key, label, 0])
     );
-
-    const resetGame = () => {
-        clearTimeout(opponentTimeout.current);
-        setCurrentMark(playerMark);
-        setBoard(INITIAL_BOARD);
-        setGameEnded(false);
-
-        if (playerMark === Mark.O) {
-            makeComputerMove(deepMatrixCopy(INITIAL_BOARD));
-        }
-    };
 
     const updateStats = (winner: Winner) => {
         const statsValuesCopy = [...statsValues];
@@ -80,13 +74,18 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
         setStatsValues(statsValuesCopy);
     };
 
-    useEffect(() => {
-        if (playerMark === Mark.O) {
-            makeComputerMove(deepMatrixCopy(board));
-        }
+    const resetGame = () => {
+        clearTimeout(opponentTimeout.current);
+        setCurrentMark(Mark.X);
+        setBoard(INITIAL_BOARD);
+        setGameEnded(false);
+    };
 
-        return () => clearTimeout(opponentTimeout.current);
-    }, [playerMark]);
+    useEffect(() => {
+        if (currentMark === computerMark) {
+            makeComputerMove();
+        }
+    }, [currentMark]);
 
     const getGameScreenBoardCellCn = useCallback(
         (row: number, col: number) => cnGameScreen('BoardCell', { [cellValToClassName[board[row][col]]]: true }),
@@ -131,7 +130,7 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
         setBoard(newBoard);
     };
 
-    const updateForWinner = (board: BoardCellValue[][], playerMove?: boolean) => {
+    const updateForWinner = (board: BoardCellValue[][], nextMark: Mark) => {
         const winner = determineWinner(board);
 
         if (winner) {
@@ -140,26 +139,22 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
             updateStats(winner);
         } else {
             setBoard(board);
-
-            if (playerMove) {
-                makeComputerMove(board);
-                setCurrentMark(computerMark);
-            } else {
-                setCurrentMark(playerMark);
-            }
+            setCurrentMark(nextMark);
         }
     };
 
-    const makeComputerMove = (newBoard: BoardCellValue[][]) => {
+    const makeComputerMove = () => {
         opponentTimeout.current = setTimeout(() => {
-            const move = getNextMove(newBoard, computerMark, Difficulty.MEDIUM);
+            const move = getNextMove(board, computerMark, difficulty);
 
             if (move) {
                 const computerMarkSet = playerMark === Mark.X ? BoardCellValue.O_MARK_SET : BoardCellValue.X_MARK_SET;
                 const [row, col] = move;
+
+                const newBoard = deepMatrixCopy(board);
                 newBoard[row][col] = computerMarkSet;
 
-                updateForWinner(newBoard);
+                updateForWinner(newBoard, playerMark);
             }
         }, OPPONENT_MOVE_TIME);
     };
@@ -172,7 +167,7 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark }) => {
         const newBoard = deepMatrixCopy(board);
         newBoard[row][col] = markToMarkSet[playerMark];
 
-        updateForWinner(newBoard, true);
+        updateForWinner(newBoard, computerMark);
     };
 
     return (

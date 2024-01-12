@@ -27,7 +27,7 @@ export enum Winner {
 
 export const INITIAL_BOARD: BoardCellValue[][] = Array(3)
     .fill(null)
-    .map(() => Array(3).fill(0));
+    .map(() => Array(3).fill(BoardCellValue.EMPTY));
 
 export const cellValToClassName: Record<BoardCellValue, string> = {
     [BoardCellValue.EMPTY]: '',

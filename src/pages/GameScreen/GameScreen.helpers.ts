@@ -15,16 +15,18 @@ export const isBoardCellAvailable = (cellValue: BoardCellValue): boolean => {
     return ![BoardCellValue.X_MARK_SET, BoardCellValue.O_MARK_SET].includes(cellValue);
 };
 
-export const furtherMovesAvailable = (board: BoardCellValue[][]): boolean => {
+const availableCellCount = (board: BoardCellValue[][]): number => {
+    let count = 0;
+
     for (let i = 0; i < board.length; i++) {
         for (let j = 0; j < board.length; j++) {
             if (isBoardCellAvailable(board[i][j])) {
-                return true;
+                count++;
             }
         }
     }
 
-    return false;
+    return count;
 };
 
 export const determineWinner = (board: BoardCellValue[][]): Winner | null => {
@@ -75,7 +77,7 @@ export const determineWinner = (board: BoardCellValue[][]): Winner | null => {
         }
     }
 
-    return !furtherMovesAvailable(board) ? Winner.TIE : null;
+    return availableCellCount(board) === 0 ? Winner.TIE : null;
 };
 
 export const getUpdatedBoard = (board: BoardCellValue[][]): BoardCellValue[][] => {
@@ -205,6 +207,11 @@ const getBestMove = (board: BoardCellValue[][], player: Mark): Move => {
 
 export const getNextMove = (board: BoardCellValue[][], player: Mark, difficulty: Difficulty): Move => {
     const randomMove = getRandomMove(board);
+
+    if (availableCellCount(board) === board.length * board.length) {
+        return randomMove;
+    }
+
     const bestMove = getBestMove(board, player);
     const i = Math.floor(Math.random() * 2);
 

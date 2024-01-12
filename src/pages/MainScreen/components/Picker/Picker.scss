@@ -9,31 +9,43 @@
     letter-spacing: 1px;
     margin: 40px 0;
 
-    &-Title {
-        color: $gray-color;
-        text-transform: uppercase;
-        font-family: OutfitBold;
+    &-Section {
         margin-bottom: 24px;
     }
 
-    &-Switch {
+    &-SectionTitle {
+        color: $gray-color;
+        text-transform: uppercase;
+        font-family: OutfitBold;
+        margin-bottom: 12px;
+        user-select: none;
+    }
+
+    &-SwitchWrapper {
+        padding: 8px;
         background-color: $primary-bg;
         border-radius: 12px;
-        padding: 8px;
+    }
+
+    &-PlayerSwitch {
         display: flex;
-        margin-bottom: 16px;
         position: relative;
+        align-items: center;
+        user-select: none;
+        height: 50px;
+
+        @media screen and (min-width: $mobile-l-breakpoint) {
+            height: 60px;
+        }
 
         &::after {
             content: '';
             background-color: $gray-color;
             border-radius: 12px;
             position: absolute;
-            width: calc(50% - 8px);
-            height: calc(100% - 16px);
-            border-radius: 12px;
-            background-color: $gray-color;
-            transition: transform 0.2s ease;
+            width: 50%;
+            height: 100%;
+            transition: 0.2s ease;
         }
 
         &_oMark::after {
@@ -41,17 +53,71 @@
         }
     }
 
-    &-SwitchItem {
-        padding: 12px;
-        flex-grow: 1;
+    &-PlayerSwitchItem {
+        flex-basis: 50%;
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        outline: none;
-        border: none;
-        background-color: transparent;
         z-index: 1;
         cursor: pointer;
+    }
+
+    &-DifficultySwitch {
+        display: flex;
+        position: relative;
+        align-items: center;
+        font-family: OutfitBold;
+        text-transform: uppercase;
+        user-select: none;
+        height: 40px;
+
+        @media screen and (min-width: $mobile-l-breakpoint) {
+            height: 50px;
+        }
+
+        &::after {
+            content: '';
+            background-color: $gray-color;
+            border-radius: 8px;
+            position: absolute;
+            width: 33.33%;
+            height: 100%;
+            transition: 0.2s ease;
+            text-align: center;
+            background-color: #4caf50;
+        }
+
+        &_medium::after {
+            transform: translateX(100%);
+            background-color: #ffc107;
+        }
+
+        &_hard::after {
+            transform: translateX(200%);
+            background-color: #d32f2f;
+        }
+    }
+
+    &-DifficultySwitchItem {
+        flex-basis: 33.33%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+        cursor: pointer;
+        transition: 0.2s ease;
+        color: $gray-color;
+        font-size: 0.75rem;
+
+        @media screen and (min-width: $mobile-l-breakpoint) {
+            font-size: 1rem;
+        }
+
+        &_current {
+            color: $black-color;
+        }
     }
 
     &-FooterText {
@@ -60,5 +126,6 @@
         text-transform: uppercase;
         color: $gray-color;
         opacity: 0.5;
+        user-select: none;
     }
 }
