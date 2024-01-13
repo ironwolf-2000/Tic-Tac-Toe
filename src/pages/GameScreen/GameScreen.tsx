@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 
 import { Mark } from '../../App.const';
 import { Logo } from '../../components';
@@ -7,7 +7,7 @@ import {
     GameScreenHeaderCn,
     GameScreenLogoCn,
     GameScreenIconButtonCn,
-    GameScreenLabelTurnCn,
+    GameScreenGameLabelCn,
     GameScreenBoardCn,
     GameScreenStatsCn,
     GameScreenStatsCellCn,
@@ -15,6 +15,7 @@ import {
     cnGameScreen,
     GameScreenFooterCn,
     GameScreenStatsOpponentLabelCn,
+    GameScreenBoardCellCn,
 } from './GameScreen.cn';
 import {
     LABEL_ICON_HEIGHT,
@@ -26,24 +27,27 @@ import {
     INITIAL_BOARD,
     OPPONENT_MOVE_TIME,
     STATS_DATA,
-    cellValToClassName,
     BoardCellValue,
     Winner,
     markToHover,
     markToMarkSet,
+    MarkState,
 } from './GameScreen.const';
 import { IGameScreenProps } from './GameScreen.typings';
 import {
     deepMatrixCopy,
     determineWinner,
+    getBoardCellMarkState,
     getNextMove,
     getUpdatedBoard,
     isBoardCellAvailable,
 } from './GameScreen.helpers';
 import { QuitGameModal } from './components/QuitGameModal';
 
-import oGray from '@assets/icons/o-gray.svg';
+import xOutline from '@assets/icons/x-outline.svg';
+import oOutline from '@assets/icons/o-outline.svg';
 import xGray from '@assets/icons/x-gray.svg';
+import oGray from '@assets/icons/o-gray.svg';
 import leaveIcon from '@assets/icons/leave.svg';
 import restartIcon from '@assets/icons/restart.svg';
 import './GameScreen.scss';
@@ -53,8 +57,18 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
 
     const [currentMark, setCurrentMark] = useState(Mark.X);
     const [board, setBoard] = useState(INITIAL_BOARD);
-    const [gameEnded, setGameEnded] = useState(false);
+    const [gameWinner, setGameWinner] = useState<Winner | null>(null);
     const [quitGameModalVisible, setQuitGameModalVisible] = useState(false);
+
+    const showModal = () => {
+        document.body.classList.add('with-overlay');
+        setQuitGameModalVisible(true);
+    };
+
+    const hideModal = () => {
+        document.body.classList.remove('with-overlay');
+        setQuitGameModalVisible(false);
+    };
 
     const GameScreenCn = cnGameScreen('', { withOverlay: quitGameModalVisible });
 
@@ -78,22 +92,17 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
         clearTimeout(opponentTimeout.current);
         setCurrentMark(Mark.X);
         setBoard(INITIAL_BOARD);
-        setGameEnded(false);
+        setGameWinner(null);
     };
 
     useEffect(() => {
-        if (currentMark === computerMark) {
+        if (!gameWinner && currentMark === computerMark) {
             makeComputerMove();
         }
-    }, [currentMark]);
-
-    const getGameScreenBoardCellCn = useCallback(
-        (row: number, col: number) => cnGameScreen('BoardCell', { [cellValToClassName[board[row][col]]]: true }),
-        [board]
-    );
+    }, [gameWinner, currentMark]);
 
     const handleBoardCellMouseHover = (row: number, col: number) => {
-        if (currentMark !== playerMark || gameEnded || board[row][col] !== BoardCellValue.EMPTY) {
+        if (currentMark !== playerMark || gameWinner || board[row][col] !== BoardCellValue.EMPTY) {
             return;
         }
 
@@ -113,7 +122,7 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
     };
 
     const handleBoardCellMouseLeave = () => {
-        if (currentMark !== playerMark || gameEnded) {
+        if (currentMark !== playerMark || gameWinner) {
             return;
         }
 
@@ -134,8 +143,8 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
         const winner = determineWinner(board);
 
         if (winner) {
+            setGameWinner(winner);
             setBoard(getUpdatedBoard(board));
-            setGameEnded(true);
             updateStats(winner);
         } else {
             setBoard(board);
@@ -160,7 +169,7 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
     };
 
     const makePlayerMove = (row: number, col: number) => {
-        if (!isBoardCellAvailable(board[row][col]) || currentMark !== playerMark || gameEnded) {
+        if (!isBoardCellAvailable(board[row][col]) || currentMark !== playerMark || gameWinner) {
             return;
         }
 
@@ -170,42 +179,92 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
         updateForWinner(newBoard, computerMark);
     };
 
-    return (
-        <>
-            <div className={GameScreenCn}>
-                <header className={GameScreenHeaderCn}>
-                    <Logo className={GameScreenLogoCn} />
-                    <div className={GameScreenLabelTurnCn}>
+    const renderGameLabel = () => {
+        return (
+            <div className={GameScreenGameLabelCn}>
+                {gameWinner === Winner.TIE ? (
+                    'draw'
+                ) : (
+                    <>
                         <img
                             src={currentMark === Mark.X ? xGray : oGray}
                             width={LABEL_ICON_WIDTH}
                             height={LABEL_ICON_HEIGHT}
                         />
-                        turn
-                    </div>
+                        {gameWinner ? 'won!' : 'turn'}
+                    </>
+                )}
+            </div>
+        );
+    };
+
+    const renderBoardCell = (row: number, col: number) => {
+        const [mark, markState] = getBoardCellMarkState(board, row, col);
+        const className = cnGameScreen('BoardCellIcon', {
+            xSet: mark === Mark.X && markState === MarkState.SET,
+            oSet: mark === Mark.O && markState === MarkState.SET,
+            winner: markState === MarkState.WINNER,
+        });
+
+        return (
+            <div
+                key={row * board.length + col}
+                className={GameScreenBoardCellCn}
+                onMouseMove={() => handleBoardCellMouseHover(row, col)}
+                onMouseLeave={() => handleBoardCellMouseLeave()}
+                onClick={() => makePlayerMove(row, col)}
+            >
+                {mark === Mark.X ? (
+                    markState === MarkState.HOVER ? (
+                        <img className={className} src={xOutline} alt="X on hover" />
+                    ) : markState ? (
+                        <span className={className}>
+                            <svg viewBox="0 0 64 64">
+                                <path
+                                    d="M15.002 1.147 32 18.145 48.998 1.147a3 3 0 0 1 4.243 0l9.612 9.612a3 3 0 0 1 0 4.243L45.855 32l16.998 16.998a3 3 0 0 1 0 4.243l-9.612 9.612a3 3 0 0 1-4.243 0L32 45.855 15.002 62.853a3 3 0 0 1-4.243 0L1.147 53.24a3 3 0 0 1 0-4.243L18.145 32 1.147 15.002a3 3 0 0 1 0-4.243l9.612-9.612a3 3 0 0 1 4.243 0Z"
+                                    fillRule="evenodd"
+                                />
+                            </svg>
+                        </span>
+                    ) : null
+                ) : null}
+                {mark === Mark.O ? (
+                    markState === MarkState.HOVER ? (
+                        <img className={className} src={oOutline} alt="O on hover" />
+                    ) : markState ? (
+                        <span className={className}>
+                            <svg viewBox="0 0 64 64">
+                                <path d="M32 0c17.673 0 32 14.327 32 32 0 17.673-14.327 32-32 32C14.327 64 0 49.673 0 32 0 14.327 14.327 0 32 0Zm0 18.963c-7.2 0-13.037 5.837-13.037 13.037 0 7.2 5.837 13.037 13.037 13.037 7.2 0 13.037-5.837 13.037-13.037 0-7.2-5.837-13.037-13.037-13.037Z" />
+                            </svg>
+                        </span>
+                    ) : null
+                ) : null}
+            </div>
+        );
+    };
+
+    return (
+        <>
+            <div className={GameScreenCn}>
+                <header className={GameScreenHeaderCn}>
+                    <Logo className={GameScreenLogoCn} />
+                    {renderGameLabel()}
                     <div className={GameScreenButtonContainerCn}>
-                        <button className={GameScreenIconButtonCn} onClick={resetGame}>
+                        <button
+                            className={cnGameScreen('IconButton', {
+                                flickering: !quitGameModalVisible && gameWinner !== null,
+                            })}
+                            onClick={resetGame}
+                        >
                             <img src={restartIcon} width={RESTART_ICON_WIDTH} height={RESTART_ICON_HEIGHT} />
                         </button>
-                        <button className={GameScreenIconButtonCn} onClick={() => setQuitGameModalVisible(true)}>
+                        <button className={GameScreenIconButtonCn} onClick={showModal}>
                             <img src={leaveIcon} width={LEAVE_ICON_WIDTH} height={LEAVE_ICON_HEIGHT} />
                         </button>
                     </div>
                 </header>
                 <div className={GameScreenBoardCn}>
-                    {board.map((rowValues, currentRow) =>
-                        rowValues.map((_, currentCol) => {
-                            return (
-                                <div
-                                    key={currentRow * board.length + currentCol}
-                                    className={getGameScreenBoardCellCn(currentRow, currentCol)}
-                                    onMouseMove={() => handleBoardCellMouseHover(currentRow, currentCol)}
-                                    onMouseLeave={() => handleBoardCellMouseLeave()}
-                                    onClick={() => makePlayerMove(currentRow, currentCol)}
-                                />
-                            );
-                        })
-                    )}
+                    {board.map((rowValues, row) => rowValues.map((_, col) => renderBoardCell(row, col)))}
                 </div>
                 <footer className={GameScreenFooterCn}>
                     <div className={GameScreenStatsCn}>
@@ -216,12 +275,12 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
                             </div>
                         ))}
                     </div>
-                    {playerMark !== currentMark && !gameEnded && (
+                    {!gameWinner && currentMark === computerMark && (
                         <p className={GameScreenStatsOpponentLabelCn}>Your opponent is thinking...</p>
                     )}
                 </footer>
             </div>
-            {quitGameModalVisible && <QuitGameModal onModalClose={() => setQuitGameModalVisible(false)} />}
+            {quitGameModalVisible && <QuitGameModal onModalClose={hideModal} />}
         </>
     );
 };

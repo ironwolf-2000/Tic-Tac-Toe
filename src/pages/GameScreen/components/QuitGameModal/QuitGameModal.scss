@@ -5,19 +5,33 @@
     background-color: $black-color;
     text-align: center;
     position: fixed;
-    left: 0;
+    left: 50%;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translate3d(-50%, -50%, 0);
     width: 100%;
-    padding: 64px 0;
+    padding: 32px 0;
+
+    @media screen and (min-width: $mobile-l-breakpoint) {
+        padding: 64px 0;
+    }
+
+    @media screen and (min-width: 500px) {
+        width: 500px;
+        border-radius: 16px;
+    }
 
     &-Title {
         color: $gray-color;
         font-family: OutfitBold;
         text-transform: uppercase;
         letter-spacing: 1px;
-        font-size: 2.5rem;
-        margin: 0 0 32px;
+        font-size: 1.75rem;
+        margin: 0 0 20px;
+
+        @media screen and (min-width: $mobile-l-breakpoint) {
+            font-size: 2.5rem;
+            margin: 0 0 32px;
+        }
     }
 
     &-ButtonWrapper {
@@ -30,8 +44,13 @@
         @extend %button;
         color: $primary-bg;
         border-radius: 8px;
-        padding: 20px 30px 22px 30px;
-        font-size: 1rem;
+        padding: 13px 15px 15px 15px;
+        font-size: 0.75rem;
+
+        @media screen and (min-width: $mobile-l-breakpoint) {
+            padding: 20px 30px 22px 30px;
+            font-size: 1rem;
+        }
 
         &_cancel {
             background-color: $gray-color;
@@ -45,7 +64,11 @@
             &:active {
                 box-shadow: inset 0 -2px 0 $gray-box-shadow;
                 transform: translateY(2px);
-                padding-bottom: 21px;
+                padding-bottom: 14px;
+
+                @media screen and (min-width: $mobile-l-breakpoint) {
+                    padding-bottom: 21px;
+                }
             }
         }
 
@@ -61,7 +84,11 @@
             &:active {
                 box-shadow: inset 0 -2px 0 $golden-box-shadow;
                 transform: translateY(2px);
-                padding-bottom: 21px;
+                padding-bottom: 14px;
+
+                @media screen and (min-width: $mobile-l-breakpoint) {
+                    padding-bottom: 21px;
+                }
             }
         }
     }

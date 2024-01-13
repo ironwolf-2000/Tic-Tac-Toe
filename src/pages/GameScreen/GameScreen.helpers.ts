@@ -1,6 +1,7 @@
 import { Difficulty, Mark } from '../../App.const';
 import {
     BoardCellValue,
+    MarkState,
     Winner,
     markToMarkSet,
     markToWinner,
@@ -10,6 +11,25 @@ import {
 import { Move } from './GameScreen.typings';
 
 export const deepMatrixCopy = <T>(M: T[][]) => M.map((row) => row.slice());
+
+export const getBoardCellMarkState = (board: BoardCellValue[][], row: number, col: number): [Mark, MarkState] | [] => {
+    switch (board[row][col]) {
+        case BoardCellValue.X_MARK_HOVER:
+            return [Mark.X, MarkState.HOVER];
+        case BoardCellValue.X_MARK_SET:
+            return [Mark.X, MarkState.SET];
+        case BoardCellValue.X_MARK_WINNER:
+            return [Mark.X, MarkState.WINNER];
+        case BoardCellValue.O_MARK_HOVER:
+            return [Mark.O, MarkState.HOVER];
+        case BoardCellValue.O_MARK_SET:
+            return [Mark.O, MarkState.SET];
+        case BoardCellValue.O_MARK_WINNER:
+            return [Mark.O, MarkState.WINNER];
+        default:
+            return [];
+    }
+};
 
 export const isBoardCellAvailable = (cellValue: BoardCellValue): boolean => {
     return ![BoardCellValue.X_MARK_SET, BoardCellValue.O_MARK_SET].includes(cellValue);

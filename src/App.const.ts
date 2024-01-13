@@ -1,6 +1,6 @@
 export enum Mark {
-    X = 'xMark',
-    O = 'oMark',
+    X = 'X',
+    O = 'O',
 }
 
 export enum Difficulty {

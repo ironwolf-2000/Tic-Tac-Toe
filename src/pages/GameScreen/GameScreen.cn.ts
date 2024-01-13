@@ -5,12 +5,13 @@ export const cnGameScreen = cn('GameScreen');
 // HEADER
 export const GameScreenHeaderCn = cnGameScreen('Header');
 export const GameScreenLogoCn = cnGameScreen('Logo');
-export const GameScreenLabelTurnCn = cnGameScreen('LabelTurn');
+export const GameScreenGameLabelCn = cnGameScreen('GameLabel');
 export const GameScreenButtonContainerCn = cnGameScreen('ButtonContainer');
 export const GameScreenIconButtonCn = cnGameScreen('IconButton');
 
 // BOARD
 export const GameScreenBoardCn = cnGameScreen('Board');
+export const GameScreenBoardCellCn = cnGameScreen('BoardCell');
 
 // FOOTER
 export const GameScreenFooterCn = cnGameScreen('Footer');

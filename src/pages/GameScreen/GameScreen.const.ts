@@ -19,6 +19,12 @@ export enum BoardCellValue {
     O_MARK_WINNER = 'O_MARK_WINNER',
 }
 
+export enum MarkState {
+    HOVER = 'HOVER',
+    SET = 'SET',
+    WINNER = 'WINNER',
+}
+
 export enum Winner {
     X_MARK = 'X_MARK',
     O_MARK = 'O_MARK',
@@ -28,16 +34,6 @@ export enum Winner {
 export const INITIAL_BOARD: BoardCellValue[][] = Array(3)
     .fill(null)
     .map(() => Array(3).fill(BoardCellValue.EMPTY));
-
-export const cellValToClassName: Record<BoardCellValue, string> = {
-    [BoardCellValue.EMPTY]: '',
-    [BoardCellValue.X_MARK_HOVER]: 'xMarkHover',
-    [BoardCellValue.X_MARK_SET]: 'xMarkSet',
-    [BoardCellValue.X_MARK_WINNER]: 'xMarkWinner',
-    [BoardCellValue.O_MARK_HOVER]: 'oMarkHover',
-    [BoardCellValue.O_MARK_SET]: 'oMarkSet',
-    [BoardCellValue.O_MARK_WINNER]: 'oMarkWinner',
-};
 
 export const STATS_DATA = [
     [Winner.X_MARK, '"X" wins'],

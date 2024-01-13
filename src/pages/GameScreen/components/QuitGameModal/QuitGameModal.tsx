@@ -13,6 +13,11 @@ import './QuitGameModal.scss';
 export const QuitGameModal: FC<IQuitGameModalProps> = ({ onModalClose }) => {
     const navigate = useNavigate();
 
+    const redirectHome = () => {
+        document.body.classList.remove('with-overlay');
+        navigate('/', { replace: true });
+    };
+
     return (
         <div className={QuitGameModalCn}>
             <p className={QuitGameModalTitleCn}>Quit the game</p>
@@ -20,10 +25,7 @@ export const QuitGameModal: FC<IQuitGameModalProps> = ({ onModalClose }) => {
                 <button className={cnQuitGameModal('Button', { cancel: true })} onClick={onModalClose}>
                     No, cancel
                 </button>
-                <button
-                    className={cnQuitGameModal('Button', { confirm: true })}
-                    onClick={() => navigate('/', { replace: true })}
-                >
+                <button className={cnQuitGameModal('Button', { confirm: true })} onClick={redirectHome}>
                     Yes, quit
                 </button>
             </div>

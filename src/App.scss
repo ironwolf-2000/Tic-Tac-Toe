@@ -3,6 +3,10 @@
 body {
     background-color: $primary-bg;
     margin: 0;
+
+    &.with-overlay {
+        overflow: hidden;
+    }
 }
 
 @font-face {

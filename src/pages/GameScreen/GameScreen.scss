@@ -2,15 +2,14 @@
 @import '@assets/styles/placeholders.scss';
 
 .GameScreen {
-    margin: 10vh auto 5vh;
+    margin: 10vh auto;
     padding: 0 24px;
     min-width: 320px;
     max-width: 420px;
 
     &_withOverlay {
         opacity: 0.5;
-        position: relative;
-        z-index: -1;
+        pointer-events: none;
     }
 
     &-Header {
@@ -28,7 +27,7 @@
         }
     }
 
-    &-LabelTurn {
+    &-GameLabel {
         display: flex;
         align-items: center;
         column-gap: 8px;
@@ -65,15 +64,21 @@
             height: 40px;
         }
 
+        &_flickering {
+            animation: flicker 1s infinite 2s;
+        }
+
         &:hover,
         &:focus {
             background-color: $gray-hover;
+            animation: none;
         }
 
         &:active {
             box-shadow: inset 0 -2px 0 $gray-box-shadow;
             transform: translateY(2px);
             padding-bottom: 1px;
+            animation: none;
         }
     }
 
@@ -83,10 +88,10 @@
         justify-content: space-between;
         margin-bottom: 24px;
         width: calc(100vw - 48px);
-        height: calc(100vw - 48px);
         min-width: 320px;
-        min-height: 320px;
         max-width: 420px;
+        height: calc(100vw - 48px);
+        min-height: 320px;
         max-height: 420px;
         gap: 16px;
     }
@@ -97,47 +102,31 @@
         box-shadow: inset 0 -8px 0 $black-box-shadow;
         border-radius: 16px;
         background-color: $black-color;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-        &::after {
-            content: '';
-            display: block;
-            height: 100%;
-            background-repeat: no-repeat;
-            background-position: 50% calc(50% - 4px);
-            background-size: 30%;
-            transition: background-size 0.2s;
+    &-BoardCellIcon {
+        padding-bottom: 8px;
+        width: 50%;
+        height: 50%;
+
+        &_xSet {
+            fill: $teal-color;
         }
 
-        &_xMarkHover::after {
-            background-image: url('../../assets/icons/x-outline.svg');
-            background-size: 50%;
-            cursor: pointer;
+        &_oSet {
+            fill: $golden-color;
         }
 
-        &_xMarkSet::after {
-            background-image: url('../../assets/icons/x.svg');
-            background-size: 50%;
+        &_winner {
+            animation: scaleIn $transition-medium;
+            fill: $white-color;
         }
 
-        &_xMarkWinner::after {
-            background-image: url('../../assets/icons/x-white.svg');
-            background-size: 50%;
-        }
-
-        &_oMarkHover::after {
-            background-image: url('../../assets/icons/o-outline.svg');
-            background-size: 50%;
-            cursor: pointer;
-        }
-
-        &_oMarkSet::after {
-            background-image: url('../../assets/icons/o.svg');
-            background-size: 50%;
-        }
-
-        &_oMarkWinner::after {
-            background-image: url('../../assets/icons/o-white.svg');
-            background-size: 50%;
+        path {
+            transition: $transition-medium;
         }
     }
 
@@ -186,5 +175,26 @@
         letter-spacing: 1px;
         text-align: center;
         color: $gray-color;
+    }
+}
+
+@keyframes scaleIn {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+@keyframes flicker {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
     }
 }
