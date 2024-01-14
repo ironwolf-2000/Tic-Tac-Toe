@@ -58,7 +58,9 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
     const [currentMark, setCurrentMark] = useState(Mark.X);
     const [board, setBoard] = useState(INITIAL_BOARD);
     const [gameWinner, setGameWinner] = useState<Winner | null>(null);
+
     const [quitGameModalVisible, setQuitGameModalVisible] = useState(false);
+    const [quitGameModalHiding, setQuitGameModalHiding] = useState(false);
 
     const showModal = () => {
         document.body.classList.add('with-overlay');
@@ -66,8 +68,13 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
     };
 
     const hideModal = () => {
-        document.body.classList.remove('with-overlay');
-        setQuitGameModalVisible(false);
+        setQuitGameModalHiding(true);
+
+        setTimeout(() => {
+            document.body.classList.remove('with-overlay');
+            setQuitGameModalHiding(false);
+            setQuitGameModalVisible(false);
+        }, 200);
     };
 
     const GameScreenCn = cnGameScreen('', { withOverlay: quitGameModalVisible });
@@ -280,7 +287,7 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
                     )}
                 </footer>
             </div>
-            {quitGameModalVisible && <QuitGameModal onModalClose={hideModal} />}
+            {quitGameModalVisible && <QuitGameModal hiding={quitGameModalHiding} onModalClose={hideModal} />}
         </>
     );
 };

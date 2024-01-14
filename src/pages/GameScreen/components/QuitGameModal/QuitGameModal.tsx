@@ -10,7 +10,7 @@ import { IQuitGameModalProps } from './QuitGameModal.typings';
 
 import './QuitGameModal.scss';
 
-export const QuitGameModal: FC<IQuitGameModalProps> = ({ onModalClose }) => {
+export const QuitGameModal: FC<IQuitGameModalProps> = ({ hiding, onModalClose }) => {
     const navigate = useNavigate();
 
     const redirectHome = () => {
@@ -19,7 +19,7 @@ export const QuitGameModal: FC<IQuitGameModalProps> = ({ onModalClose }) => {
     };
 
     return (
-        <div className={QuitGameModalCn}>
+        <div className={cnQuitGameModal('', { hiding })}>
             <p className={QuitGameModalTitleCn}>Quit the game</p>
             <div className={QuitGameModalButtonWrapperCn}>
                 <button className={cnQuitGameModal('Button', { cancel: true })} onClick={onModalClose}>
