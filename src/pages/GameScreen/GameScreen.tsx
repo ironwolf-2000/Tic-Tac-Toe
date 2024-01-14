@@ -14,7 +14,6 @@ import {
     GameScreenStatsCellCountCn,
     cnGameScreen,
     GameScreenFooterCn,
-    GameScreenStatsOpponentLabelCn,
     GameScreenBoardCellCn,
 } from './GameScreen.cn';
 import {
@@ -25,13 +24,12 @@ import {
     RESTART_ICON_HEIGHT,
     RESTART_ICON_WIDTH,
     INITIAL_BOARD,
-    OPPONENT_MOVE_TIME,
-    STATS_DATA,
     BoardCellValue,
     Winner,
     markToHover,
     markToMarkSet,
     MarkState,
+    MODAL_HIDING_TIME,
 } from './GameScreen.const';
 import { IGameScreenProps } from './GameScreen.typings';
 import {
@@ -74,7 +72,7 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
             document.body.classList.remove('with-overlay');
             setQuitGameModalHiding(false);
             setQuitGameModalVisible(false);
-        }, 200);
+        }, MODAL_HIDING_TIME);
     };
 
     const GameScreenCn = cnGameScreen('', { withOverlay: quitGameModalVisible });
@@ -85,14 +83,27 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
         return () => clearTimeout(opponentTimeout.current);
     }, []);
 
-    const [statsValues, setStatsValues] = useState<[Winner, string, number][]>(
-        STATS_DATA.map(([key, label]) => [key, label, 0])
-    );
+    const [statsValues, setStatsValues] = useState<[Winner, number][]>([
+        [Winner.O_MARK, 0],
+        [Winner.TIE, 0],
+        [Winner.X_MARK, 0],
+    ]);
 
     const updateStats = (winner: Winner) => {
-        const statsValuesCopy = [...statsValues];
-        statsValuesCopy[statsValuesCopy.findIndex(([key, _, __]) => key === winner)][2]++;
-        setStatsValues(statsValuesCopy);
+        const newStatsValues = [...statsValues];
+        newStatsValues[statsValues.findIndex(([key, _]) => key === winner)][1]++;
+        setStatsValues(newStatsValues);
+    };
+
+    const getStatsLabel = (key: Winner): string => {
+        switch (key) {
+            case Winner.X_MARK:
+                return `X (${playerMark === Mark.X ? 'YOU' : 'CPU'})`;
+            case Winner.O_MARK:
+                return `O (${playerMark === Mark.O ? 'YOU' : 'CPU'})`;
+            default:
+                return 'Ties';
+        }
     };
 
     const resetGame = () => {
@@ -160,6 +171,9 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
     };
 
     const makeComputerMove = () => {
+        // 1000, 1100, ..., 1900, 2000
+        const opponentMoveTime = Math.floor(Math.random() * 11) * 100 + 1000;
+
         opponentTimeout.current = setTimeout(() => {
             const move = getNextMove(board, computerMark, difficulty);
 
@@ -172,7 +186,7 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
 
                 updateForWinner(newBoard, playerMark);
             }
-        }, OPPONENT_MOVE_TIME);
+        }, opponentMoveTime);
     };
 
     const makePlayerMove = (row: number, col: number) => {
@@ -275,16 +289,20 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
                 </div>
                 <footer className={GameScreenFooterCn}>
                     <div className={GameScreenStatsCn}>
-                        {statsValues.map(([key, label, value]) => (
+                        {statsValues.map(([key, value]) => (
                             <div key={key} className={GameScreenStatsCellCn}>
-                                <div>{label}</div>
+                                <div>{getStatsLabel(key)}</div>
                                 <span className={GameScreenStatsCellCountCn}>{value}</span>
                             </div>
                         ))}
                     </div>
-                    {!gameWinner && currentMark === computerMark && (
-                        <p className={GameScreenStatsOpponentLabelCn}>Your opponent is thinking...</p>
-                    )}
+                    <p
+                        className={cnGameScreen('OpponentLabel', {
+                            visible: !gameWinner && currentMark === computerMark,
+                        })}
+                    >
+                        Your opponent is thinking...
+                    </p>
                 </footer>
             </div>
             {quitGameModalVisible && <QuitGameModal hiding={quitGameModalHiding} onModalClose={hideModal} />}

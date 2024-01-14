@@ -7,7 +7,7 @@ export const RESTART_ICON_HEIGHT = 18;
 export const LEAVE_ICON_WIDTH = 22;
 export const LEAVE_ICON_HEIGHT = 22;
 
-export const OPPONENT_MOVE_TIME = 1000;
+export const MODAL_HIDING_TIME = 200;
 
 export enum BoardCellValue {
     EMPTY = 'EMPTY',
@@ -34,12 +34,6 @@ export enum Winner {
 export const INITIAL_BOARD: BoardCellValue[][] = Array(3)
     .fill(null)
     .map(() => Array(3).fill(BoardCellValue.EMPTY));
-
-export const STATS_DATA = [
-    [Winner.X_MARK, '"X" wins'],
-    [Winner.O_MARK, '"O" wins'],
-    [Winner.TIE, 'Ties'],
-] as const;
 
 export const markHoverToMarkSet = {
     [BoardCellValue.X_MARK_HOVER]: BoardCellValue.X_MARK_SET,

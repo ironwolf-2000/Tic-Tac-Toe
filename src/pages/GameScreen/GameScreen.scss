@@ -2,7 +2,7 @@
 @import '@assets/styles/placeholders.scss';
 
 .GameScreen {
-    margin: 10vh auto;
+    margin: 5vh auto;
     padding: 0 24px;
     min-width: 320px;
     max-width: 420px;
@@ -29,6 +29,7 @@
 
     &-GameLabel {
         display: flex;
+        justify-content: center;
         align-items: center;
         column-gap: 8px;
         background-color: $black-color;
@@ -37,8 +38,13 @@
         font-family: OutfitBold;
         letter-spacing: 1px;
         text-transform: uppercase;
-        padding: 8px 10px 12px 10px;
         border-radius: 8px;
+        // same width as the board cell
+        width: calc((100vw - 80px) / 3);
+        min-width: calc((320px - 32px) / 3);
+        max-width: calc((420px - 32px) / 3);
+        padding: 10px 8px 14px;
+        box-sizing: border-box;
     }
 
     &-ButtonContainer {
@@ -175,6 +181,11 @@
         letter-spacing: 1px;
         text-align: center;
         color: $gray-color;
+        visibility: hidden;
+
+        &_visible {
+            visibility: visible;
+        }
     }
 }
 

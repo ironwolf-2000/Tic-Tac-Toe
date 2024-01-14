@@ -18,4 +18,3 @@ export const GameScreenFooterCn = cnGameScreen('Footer');
 export const GameScreenStatsCn = cnGameScreen('Stats');
 export const GameScreenStatsCellCn = cnGameScreen('StatsCell');
 export const GameScreenStatsCellCountCn = cnGameScreen('StatsCellCount');
-export const GameScreenStatsOpponentLabelCn = cnGameScreen('OpponentLabel');
