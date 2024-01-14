@@ -5,6 +5,8 @@ export interface IGameScreenProps {
     playerMark: Mark;
     /** game's difficulty */
     difficulty: Difficulty;
+    /** whether the game has sounds */
+    soundOn: boolean;
 }
 
 export type Move = [number, number] | null;

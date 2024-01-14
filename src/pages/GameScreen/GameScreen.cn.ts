@@ -11,7 +11,6 @@ export const GameScreenIconButtonCn = cnGameScreen('IconButton');
 
 // BOARD
 export const GameScreenBoardCn = cnGameScreen('Board');
-export const GameScreenBoardCellCn = cnGameScreen('BoardCell');
 
 // FOOTER
 export const GameScreenFooterCn = cnGameScreen('Footer');

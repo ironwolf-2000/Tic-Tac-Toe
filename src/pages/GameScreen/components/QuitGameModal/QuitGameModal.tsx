@@ -1,19 +1,19 @@
 import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-    QuitGameModalButtonWrapperCn,
-    QuitGameModalCn,
-    QuitGameModalTitleCn,
-    cnQuitGameModal,
-} from './QuitGameModal.cn';
+import { QuitGameModalButtonWrapperCn, QuitGameModalTitleCn, cnQuitGameModal } from './QuitGameModal.cn';
 import { IQuitGameModalProps } from './QuitGameModal.typings';
 
+import { sound } from '@assets/sounds';
 import './QuitGameModal.scss';
 
-export const QuitGameModal: FC<IQuitGameModalProps> = ({ hiding, onModalClose }) => {
+export const QuitGameModal: FC<IQuitGameModalProps> = ({ hiding, onModalClose, soundOn }) => {
     const navigate = useNavigate();
 
     const redirectHome = () => {
+        if (soundOn) {
+            sound.click.play();
+        }
+
         document.body.classList.remove('with-overlay');
         navigate('/', { replace: true });
     };

@@ -2,23 +2,50 @@ import { FC } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Logo } from '../../components';
-import { mainScreenCn, mainScreenNewGameButtonCn } from './MainScreen.cn';
+import { mainScreenCn, mainScreenNewGameButtonCn, mainScreenSoundIconCn } from './MainScreen.cn';
 import { Picker } from './components/Picker';
 import { IMainScreenProps } from './MainScreen.typings';
+import { SOUND_ICON_HEIGHT, SOUND_ICON_WIDTH } from './MainScreen.const';
 
+import soundOffIcon from '@assets/icons/sound-off.svg';
+import soundOnIcon from '@assets/icons/sound-on.svg';
+import { sound } from '@assets/sounds';
 import './MainScreen.scss';
 
-export const MainScreen: FC<IMainScreenProps> = ({ playerMark, difficulty, onPlayerMarkPick, onDifficultyPick }) => {
+export const MainScreen: FC<IMainScreenProps> = ({
+    playerMark,
+    onPlayerMarkPick,
+    difficulty,
+    onDifficultyPick,
+    soundOn,
+    onSoundChange,
+}) => {
+    const handleNewGameClick = () => {
+        if (soundOn) {
+            sound.click.play();
+        }
+    };
+
     return (
         <main className={mainScreenCn}>
-            <Logo />
+            <div>
+                <Logo />
+                <img
+                    className={mainScreenSoundIconCn}
+                    src={soundOn ? soundOnIcon : soundOffIcon}
+                    alt={soundOn ? 'sound is on' : 'sound is off'}
+                    width={SOUND_ICON_WIDTH}
+                    height={SOUND_ICON_HEIGHT}
+                    onClick={onSoundChange}
+                />
+            </div>
             <Picker
                 playerMark={playerMark}
                 onPlayerMarkPick={onPlayerMarkPick}
                 difficulty={difficulty}
                 onDifficultyPick={onDifficultyPick}
             />
-            <Link className={mainScreenNewGameButtonCn} to="/game">
+            <Link className={mainScreenNewGameButtonCn} onClick={handleNewGameClick} to="/game">
                 New Game
             </Link>
         </main>

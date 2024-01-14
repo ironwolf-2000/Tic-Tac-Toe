@@ -19,7 +19,7 @@ import xBlack from '@assets/icons/x-black.svg';
 import xGray from '@assets/icons/x-gray.svg';
 import './Picker.scss';
 
-export const Picker: FC<IPickerProps> = ({ playerMark, difficulty, onPlayerMarkPick, onDifficultyPick }) => {
+export const Picker: FC<IPickerProps> = ({ playerMark, onPlayerMarkPick, difficulty, onDifficultyPick }) => {
     const PickerPlayerSwitchCn = cnPicker('PlayerSwitch', { oMark: playerMark === Mark.O });
     const PickerDifficultySwitchCn = cnPicker('DifficultySwitch', {
         medium: difficulty === Difficulty.MEDIUM,

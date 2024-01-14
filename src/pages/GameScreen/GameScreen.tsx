@@ -14,7 +14,6 @@ import {
     GameScreenStatsCellCountCn,
     cnGameScreen,
     GameScreenFooterCn,
-    GameScreenBoardCellCn,
 } from './GameScreen.cn';
 import {
     LABEL_ICON_HEIGHT,
@@ -48,9 +47,10 @@ import xGray from '@assets/icons/x-gray.svg';
 import oGray from '@assets/icons/o-gray.svg';
 import leaveIcon from '@assets/icons/leave.svg';
 import restartIcon from '@assets/icons/restart.svg';
+import { sound } from '@assets/sounds';
 import './GameScreen.scss';
 
-export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => {
+export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty, soundOn }) => {
     const computerMark = playerMark === Mark.X ? Mark.O : Mark.X;
 
     const [currentMark, setCurrentMark] = useState(Mark.X);
@@ -61,11 +61,19 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
     const [quitGameModalHiding, setQuitGameModalHiding] = useState(false);
 
     const showModal = () => {
+        if (soundOn) {
+            sound.click.play();
+        }
+
         document.body.classList.add('with-overlay');
         setQuitGameModalVisible(true);
     };
 
     const hideModal = () => {
+        if (soundOn) {
+            sound.click.play();
+        }
+
         setQuitGameModalHiding(true);
 
         setTimeout(() => {
@@ -107,6 +115,10 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
     };
 
     const resetGame = () => {
+        if (soundOn) {
+            sound.click.play();
+        }
+
         clearTimeout(opponentTimeout.current);
         setCurrentMark(Mark.X);
         setBoard(INITIAL_BOARD);
@@ -194,6 +206,10 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
             return;
         }
 
+        if (soundOn) {
+            sound.pop.play();
+        }
+
         const newBoard = deepMatrixCopy(board);
         newBoard[row][col] = markToMarkSet[playerMark];
 
@@ -230,7 +246,7 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
         return (
             <div
                 key={row * board.length + col}
-                className={GameScreenBoardCellCn}
+                className={cnGameScreen('BoardCell', { hover: markState === MarkState.HOVER })}
                 onMouseMove={() => handleBoardCellMouseHover(row, col)}
                 onMouseLeave={() => handleBoardCellMouseLeave()}
                 onClick={() => makePlayerMove(row, col)}
@@ -305,7 +321,9 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty }) => 
                     </p>
                 </footer>
             </div>
-            {quitGameModalVisible && <QuitGameModal hiding={quitGameModalHiding} onModalClose={hideModal} />}
+            {quitGameModalVisible && (
+                <QuitGameModal hiding={quitGameModalHiding} onModalClose={hideModal} soundOn={soundOn} />
+            )}
         </>
     );
 };

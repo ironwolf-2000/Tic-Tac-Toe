@@ -3,4 +3,6 @@ export interface IQuitGameModalProps {
     hiding: boolean;
     /** closes the modal */
     onModalClose: () => void;
+    /** whether the game has sounds */
+    soundOn: boolean;
 }
