@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Logo } from '../../components';
-import { mainScreenCn, mainScreenNewGameButtonCn, mainScreenSoundIconCn } from './MainScreen.cn';
+import { mainScreenCn, mainScreenNewGameButtonCn, mainScreenSoundButtonCn } from './MainScreen.cn';
 import { Picker } from './components/Picker';
 import { IMainScreenProps } from './MainScreen.typings';
 import { SOUND_ICON_HEIGHT, SOUND_ICON_WIDTH } from './MainScreen.const';
@@ -30,14 +30,18 @@ export const MainScreen: FC<IMainScreenProps> = ({
         <main className={mainScreenCn}>
             <div>
                 <Logo />
-                <img
-                    className={mainScreenSoundIconCn}
-                    src={soundOn ? soundOnIcon : soundOffIcon}
-                    alt={soundOn ? 'sound is on' : 'sound is off'}
-                    width={SOUND_ICON_WIDTH}
-                    height={SOUND_ICON_HEIGHT}
+                <button
+                    className={mainScreenSoundButtonCn}
+                    aria-label={soundOn ? 'Turn sound off' : 'Turn sound on'}
                     onClick={onSoundChange}
-                />
+                >
+                    <img
+                        src={soundOn ? soundOnIcon : soundOffIcon}
+                        alt={soundOn ? 'sound is on' : 'sound is off'}
+                        width={SOUND_ICON_WIDTH}
+                        height={SOUND_ICON_HEIGHT}
+                    />
+                </button>
             </div>
             <Picker
                 playerMark={playerMark}

@@ -8,11 +8,13 @@
     max-width: 420px;
     position: relative;
 
-    &-SoundIcon {
+    &-SoundButton {
         position: absolute;
         right: 32px;
         top: 4px;
         cursor: pointer;
+        background: transparent;
+        border: none;
     }
 
     &-NewGameButton {

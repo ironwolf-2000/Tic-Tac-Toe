@@ -244,8 +244,9 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty, sound
         });
 
         return (
-            <div
+            <button
                 key={row * board.length + col}
+                tabIndex={quitGameModalVisible ? -1 : 0}
                 className={cnGameScreen('BoardCell', { hover: markState === MarkState.HOVER })}
                 onMouseMove={() => handleBoardCellMouseHover(row, col)}
                 onMouseLeave={() => handleBoardCellMouseLeave()}
@@ -276,7 +277,7 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty, sound
                         </span>
                     ) : null
                 ) : null}
-            </div>
+            </button>
         );
     };
 
@@ -291,11 +292,18 @@ export const GameScreen: FC<IGameScreenProps> = ({ playerMark, difficulty, sound
                             className={cnGameScreen('IconButton', {
                                 flickering: !quitGameModalVisible && gameWinner !== null,
                             })}
+                            tabIndex={quitGameModalVisible ? -1 : 0}
+                            aria-label="Restart the game"
                             onClick={resetGame}
                         >
                             <img src={restartIcon} width={RESTART_ICON_WIDTH} height={RESTART_ICON_HEIGHT} />
                         </button>
-                        <button className={GameScreenIconButtonCn} onClick={showModal}>
+                        <button
+                            className={GameScreenIconButtonCn}
+                            onClick={showModal}
+                            tabIndex={quitGameModalVisible ? -1 : 0}
+                            aria-label="Quit the game"
+                        >
                             <img src={leaveIcon} width={LEAVE_ICON_WIDTH} height={LEAVE_ICON_HEIGHT} />
                         </button>
                     </div>

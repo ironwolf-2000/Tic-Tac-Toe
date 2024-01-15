@@ -35,12 +35,20 @@ export const Picker: FC<IPickerProps> = ({ playerMark, onPlayerMarkPick, difficu
                 <header className={PickerSectionTitleCn}>Player mark</header>
                 <div className={PickerSwitchWrapperCn}>
                     <div className={PickerPlayerSwitchCn}>
-                        <span className={PickerPlayerSwitchItemCn} onClick={() => onPlayerMarkPick(Mark.X)}>
-                            <img src={xSrc} width={ICON_WIDTH} height={ICON_HEIGHT} />
-                        </span>
-                        <span className={PickerPlayerSwitchItemCn} onClick={() => onPlayerMarkPick(Mark.O)}>
-                            <img src={oSrc} width={ICON_WIDTH} height={ICON_HEIGHT} />
-                        </span>
+                        <button
+                            className={PickerPlayerSwitchItemCn}
+                            aria-label="Pick X mark"
+                            onClick={() => onPlayerMarkPick(Mark.X)}
+                        >
+                            <img src={xSrc} alt="X mark" width={ICON_WIDTH} height={ICON_HEIGHT} />
+                        </button>
+                        <button
+                            className={PickerPlayerSwitchItemCn}
+                            aria-label="Pick O mark"
+                            onClick={() => onPlayerMarkPick(Mark.O)}
+                        >
+                            <img src={oSrc} alt="O mark" width={ICON_WIDTH} height={ICON_HEIGHT} />
+                        </button>
                     </div>
                 </div>
             </section>
@@ -49,13 +57,13 @@ export const Picker: FC<IPickerProps> = ({ playerMark, onPlayerMarkPick, difficu
                 <div className={PickerSwitchWrapperCn}>
                     <div className={PickerDifficultySwitchCn}>
                         {DIFFICULTIES.map(({ key, label }) => (
-                            <span
+                            <button
                                 key={key}
                                 className={cnPicker('DifficultySwitchItem', { current: key === difficulty })}
                                 onClick={() => onDifficultyPick(key)}
                             >
                                 {label}
-                            </span>
+                            </button>
                         ))}
                     </div>
                 </div>

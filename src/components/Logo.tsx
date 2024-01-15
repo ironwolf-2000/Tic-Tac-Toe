@@ -13,8 +13,8 @@ export const Logo: FC<ILogoProps> = ({ className }) => {
 
     return (
         <div className={LogoCn}>
-            <img src={xIcon} width={LOGO_ICON_WIDTH} height={LOGO_ICON_HEIGHT} />
-            <img src={oIcon} width={LOGO_ICON_WIDTH} height={LOGO_ICON_HEIGHT} />
+            <img src={xIcon} alt="X mark" width={LOGO_ICON_WIDTH} height={LOGO_ICON_HEIGHT} />
+            <img src={oIcon} alt="O mark" width={LOGO_ICON_WIDTH} height={LOGO_ICON_HEIGHT} />
         </div>
     );
 };
